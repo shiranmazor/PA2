@@ -5,11 +5,11 @@ Provides an API to keep track of discrete time axis
 #ifndef _TIME_H_
 #define _TIME_H_
 
-typedef unsigned long long time;
+typedef unsigned long long timer;
 
 typedef struct Time
 {
-	time value;		// value of current time
+	timer value;		// value of current time
 } Time;
 
 // initializes the time module

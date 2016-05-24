@@ -2,7 +2,9 @@
 #include <WinSock2.h>
 #include "weightedFairQueuingScheduler.h"
 
-static Time t;
+static timer time;
+static unsigned long long transmitting;
+Packet* next_packet;
 
 /*
 line format:
@@ -35,40 +37,47 @@ bool parseLine(Packet* p, const char* line)
 		parameterIndex++;
 	}
 }
-bool HandleInputPacket(char* inputLine)
-{
-	Packet* p = NULL;
-	p = (Packet*)malloc(sizeof(Packet));
-	if (p == NULL)
-	{
-		printf("packet allocation failed");
-		return NULL;
-	}
 
+// calc next_packet virtual finish time and insert to relevant queue 
+bool HandleInputPacket()
+{
 	
-}
-
-
-
-void InitScheduler()
-{
-	t = time_start();
 }
 
 
 int main(void)
 {
 	char line[INPUT_SIZE];
-	bool firstLine = TRUE;
-	while (fgets(line, INPUT_SIZE, stdin) != NULL)
+	time = 0;
+	transmitting = 0;
+	next_packet = (Packet*)malloc(sizeof(Packet));
+	if (next_packet == NULL)
 	{
-		if (firstLine)
-		{
-			InitScheduler();
-			firstLine = FALSE;
-		}
-		HandleInputPacket(line);
-		printf("%s\n", line);
+		printf("packet allocation failed");
+		return NULL;
 	}
+
+	if (fgets(line, INPUT_SIZE, stdin) != NULL)
+		parseLine(next_packet, line);
+
+	do{
+		// handle input at this time
+		if (next_packet->time == time){
+			HandleInputPacket();
+			if (fgets(line, INPUT_SIZE, stdin) != NULL)
+				parseLine(next_packet, line);
+			continue;
+		}
+
+		// handle output
+		if (transmitting == 0){
+			// begin transmition of next packet
+			// transmitting = packet_to_be_transmitted->time;
+		}
+
+		// advance time
+		time++;
+		transmitting--;
+	} while (1); // CHANGE TO while packet queue not empty
 	return 0;
 }
