@@ -1,8 +1,13 @@
 #include "FlowsBuffer.h"
 // the list of flows
-static Queue flows;
+static FHeap flows;
 static int packetCounter = 0;
 
+
+void InitFlowBuffer()
+{
+	heap_init(&flows);
+}
 
 int flowComapre(const Net* net1, const Net* net2)
 {
@@ -17,14 +22,16 @@ int flowComapre(const Net* net1, const Net* net2)
 
 Flow* findFlow(const Packet* p)
 {
-	QueueNode* it = flows.front;
-	while (it != NULL)
+	Flow* flow;
+	for (int i = 0; i < flows.count; i++)
+	//while (it != NULL)
 	{
-		Flow* flow = (Flow*)it->data;
+		flow = flows.data[i];
+		//Flow* flow = (Flow*)it->data;
 		if (flowComapre(&(p->net_data), &(flow->net_data)) == 0)
 			return flow;
 
-		it = it->next;
+		//it = it->next;
 	}
 
 	return NULL;
@@ -32,9 +39,8 @@ Flow* findFlow(const Packet* p)
 
 Flow* createFlow(const Packet* p)
 {
-	Flow* f = flow_create(&(p->net_data), p->weight);
-	f->OnPacketRemoved = buffer_onPacketRemoved;
-	enqueue(&flows, f);
+	Flow* f = flow_create(p, buffer_onPacketRemoved);
+	heap_push(&flows, f);
 	return f;
 }
 
@@ -61,16 +67,34 @@ bool buffer_write(Packet* p)
 
 bool buffer_isEmpty()
 {
-	return packetCounter == 0;
+	//return packetCounter == 0;
+	return (flow_next(flows.data[flows.count - 1]) == NULL);
 }
-QueueNode* buffer_first()
+
+
+//QueueNode* buffer_first()
+//{
+//	return flows.front;
+//}
+
+// pop next flow, dequeue next packet, push flow back to heap
+Packet* getPacketToTransmit()
 {
-	return flows.front;
+	Flow* flow = heap_front(&flows);
+	heap_pop(&flows);
+	Packet* pkt = flow_dequeue(flow);
+	heap_push(&flows, flow);
+	return pkt;
+}
+
+long buffer_getTotalWeight()
+{
+	return flows.weight;
 }
 
 /*
 count the flows with packets in his packets queue
-*/
+
 long buffer_getActiveLinks()
 {
 	int activeLinks = 0;
@@ -87,3 +111,4 @@ long buffer_getActiveLinks()
 	return activeLinks;
 
 }
+*/

@@ -28,7 +28,8 @@ typedef struct Net
 
 typedef struct Packet
 {
-	time time;
+	unsigned long long time; // do we really need this?
+	unsigned long long finish_time;
 	Net net_data;
 	unsigned int length;
 	long weight;	// defaults to 1

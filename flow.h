@@ -24,11 +24,12 @@ Packet* flow_dequeue(Flow* flow);
 bool flow_enqueue(Flow* flow, Packet* p);
 
 // creates a new flow.
-Flow* flow_create(const Net* net_data, long weight);
+Flow* flow_create(Packet *p, void(*callback)(Flow* flow));
 
 // frees a flow
 void flow_free(Flow* flow);
 
-
+// returns a pointer to the next packet in the flow
+Packet* flow_next(Flow* flow);
 
 #endif

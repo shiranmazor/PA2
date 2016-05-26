@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="flow.c" />
     <ClCompile Include="FlowsBuffer.c" />
+    <ClCompile Include="heap.c" />
     <ClCompile Include="queue.c" />
     <ClCompile Include="time.c" />
     <ClCompile Include="weightedFairQueuingScheduler.c" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="flow.h" />
     <ClInclude Include="FlowsBuffer.h" />
+    <ClInclude Include="heap.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="time.h" />
     <ClInclude Include="types.h" />

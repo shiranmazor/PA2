@@ -1,3 +1,5 @@
+// DEPRECATED - DELETE ME
+
 #include "time.h"
 
 Time time_start()

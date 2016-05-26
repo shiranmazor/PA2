@@ -1,3 +1,5 @@
+// DEPRECATED - DELETE ME
+
 /*
 Time module
 Provides an API to keep track of discrete time axis

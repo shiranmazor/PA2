@@ -22,7 +22,8 @@ Packet* flow_dequeue(Flow* flow)
 	return p;
 }
 
-Flow* flow_create(const Net* net_data, long weight)
+//Flow* flow_create(const Net* net_data, long weight)
+Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 {
 	Flow* flow = (Flow*)malloc(sizeof(Flow));
 	if (flow == NULL)
@@ -31,10 +32,12 @@ Flow* flow_create(const Net* net_data, long weight)
 		return NULL;
 	}
 
-	flow->net_data = *net_data;
-	flow->weight = weight;
+	flow->net_data = p->net_data;
+	flow->weight = p->weight;
 	flow->packets = create_queue();
 	flow->priority = lastPriority++;
+	flow->OnPacketRemoved = callback;
+	flow_enqueue(flow, p);
 
 	return flow;
 }
@@ -45,3 +48,8 @@ void flow_free(Flow* flow)
 	free(flow);
 }
 
+Packet* flow_next(Flow* flow)
+{
+	Packet* p = (Packet*)queue_front(flow->packets);
+	return p;
+}
