@@ -4,7 +4,7 @@
 #include "flow.h"
 #include "types.h"
 
-static const unsigned int base_size = 100;
+static const int base_size = 100;
 
 int Cmp(Flow *a, Flow *b)
 {
@@ -15,7 +15,7 @@ int Cmp(Flow *a, Flow *b)
 }
 
 // Prepares the heap for use
-void heap_init(FHeap *restrict h)
+void heap_init(FHeap * h)
 {
 	//*h = (Heap){
 	//	.size = base_size,
@@ -31,7 +31,7 @@ void heap_init(FHeap *restrict h)
 }
 
 // Inserts element to the heap
-void heap_push(FHeap *restrict h, Flow *value)
+void heap_push(FHeap * h, Flow *value)
 {
 	unsigned int index, parent;
 
@@ -58,9 +58,9 @@ void heap_push(FHeap *restrict h, Flow *value)
 }
 
 // Removes the biggest element from the heap
-void heap_pop(FHeap *restrict h)
+void heap_pop(FHeap * h)
 {
-	unsigned int index, swap, other;
+	int index, swap, other;
 
 	// Remove the biggest element
 	Flow* temp = h->data[--h->count];

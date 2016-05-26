@@ -3,7 +3,7 @@
 #include "weightedFairQueuingScheduler.h"
 #include "FlowsBuffer.h"
 
-static timer time;
+static unsigned long long time;
 static unsigned long long transmitting;
 static Packet* next_packet;
 
@@ -11,7 +11,7 @@ static Packet* next_packet;
 line format:
 time Sadd Sport Dadd Dport length [weight]
 */
-bool parseLine(Packet* p, const char* line)
+void parseLine(Packet* p, const char* line)
 {
 	int parameterIndex = 0;
 	char * pch;
