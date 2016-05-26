@@ -42,7 +42,7 @@ void parseLine(Packet* p, const char* line)
 // calc next_packet virtual finish time and insert to relevant queue 
 bool HandleInputPacket()
 {
-	calcRound(next_packet);
+	calcRound(next_packet); // ?
 	calcFinishTime(next_packet);
 
 	buffer_write(next_packet);
@@ -91,6 +91,8 @@ int main(void)
 		// advance time
 		time++;
 		transmitting--;
-	} while (buffer_isEmpty());
+	} while (!buffer_isEmpty());
+	
+	free(next_packet);
 	return 0;
 }

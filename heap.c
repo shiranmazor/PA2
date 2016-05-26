@@ -17,11 +17,6 @@ int Cmp(Flow *a, Flow *b)
 // Prepares the heap for use
 void heap_init(FHeap * h)
 {
-	//*h = (Heap){
-	//	.size = base_size,
-	//	.count = 0,
-	//	.data = malloc(sizeof(type) * base_size)
-	//};
 	h = malloc(sizeof(FHeap));
 	h->size = base_size;
 	h->count = 0;
@@ -57,12 +52,12 @@ void heap_push(FHeap * h, Flow *value)
 	if (!queue_isEmpty(value->packets)) h->weight += value->weight;
 }
 
-// Removes the biggest element from the heap
+// Removes the smallest element from the heap
 void heap_pop(FHeap * h)
 {
 	int index, swap, other;
 
-	// Remove the biggest element
+	// Remove the smallest element
 	Flow* temp = h->data[--h->count];
 
 	// Resize the heap if it's consuming too much memory

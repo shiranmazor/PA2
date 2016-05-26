@@ -10,8 +10,4 @@ void parseLine(Packet* p, const char* line);
 void transmitPacket(Packet pkt);
 int main(void);
 
-static unsigned long long time;
-static unsigned long long transmitting;
-static Packet* next_packet;
-
 #endif
