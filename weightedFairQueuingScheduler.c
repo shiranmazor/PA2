@@ -1,5 +1,6 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-#include <WinSock2.h>
+﻿#pragma warning(disable: 4996)
+#define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "weightedFairQueuingScheduler.h"
 #include "FlowsBuffer.h"
 
@@ -42,8 +43,9 @@ void parseLine(Packet* p, const char* line)
 // calc next_packet virtual finish time and insert to relevant queue 
 bool HandleInputPacket()
 {
-	calcRound(next_packet); // ?
-	calcFinishTime(next_packet);
+	//todo:shiran
+	//calcRound(next_packet); // ?
+	//calcFinishTime(next_packet);
 
 	buffer_write(next_packet);
 	return 0;

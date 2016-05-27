@@ -1,5 +1,6 @@
 #ifndef _WFQ_H_
 #define _WFQ_H_
+#include <WinSock2.h>
 #include "types.h"
 #include "flow.h"
 
