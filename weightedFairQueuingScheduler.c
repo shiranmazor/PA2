@@ -7,6 +7,7 @@
 static unsigned long long time;
 static unsigned long long transmitting;
 static Packet* next_packet;
+static Queue* incoming_packets;
 //global variable for the current round of the system according to the incoming packets
 //used only for round calculations for each  recive packet
 static Round last_round;
@@ -100,8 +101,10 @@ void calcFinishTime(Packet* p)
 	p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / packet_flow_weight;
 	
 }
-// calc next_packet virtual finish time and insert to relevant queue 
-void HandleInputPacket(long time_delta)
+/*
+scan the incoming packt
+*/
+void HandleInputPackets()
 {
 	//for each packet we will calc round (even\arrival time) and last_pi (finish time)
 	calcRound(next_packet, time_delta);
