@@ -175,24 +175,22 @@ bool parsePackets()
 
 int main(void)
 {
-	char line[INPUT_SIZE];
 	bool input;
 	Packet* pkt;
 	InitFlowBuffer();
 	time = 0;
-	long time_delta = 0;
 	transmitting = 0;
 	incoming_packets = create_queue();
 
 	do
 	{
 		// handle input at this time
-		parsePackets();
+		input = parsePackets();
 
 		handleInputPackets();
 
 		// handle output
-		if (transmitting == 0)
+		if (transmitting == 0 && !buffer_isEmpty())
 		{
 			// begin transmition of next packet
 			if (time != 0){
@@ -205,10 +203,9 @@ int main(void)
 
 		// advance time
 		time++;
-		time_delta++;
 		transmitting--;
 		
-	} while (!buffer_isEmpty() && input);
+	} while (!buffer_isEmpty() || input);
 	
 	free(next_packet);
 	return 0;
