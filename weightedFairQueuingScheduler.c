@@ -176,7 +176,7 @@ bool parsePackets()
 int main(void)
 {
 	bool input;
-	Packet* pkt;
+	Packet* packet_to_transmit = NULL;
 	InitFlowBuffer();
 	time = 0;
 	transmitting = 0;
@@ -193,12 +193,13 @@ int main(void)
 		if (transmitting == 0 && !buffer_isEmpty())
 		{
 			// begin transmition of next packet
-			if (time != 0){
-				pkt = removePacketFromBuffer();
-				free(pkt);
+			if (packet_to_transmit != NULL){
+				packet_to_transmit = removePacketFromBuffer();
+				free(packet_to_transmit);
 			}
-			pkt = showNextPacketToTransmit();
-			transmitPacket(*pkt);
+			packet_to_transmit = showNextPacketToTransmit();
+			if (packet_to_transmit != NULL) 
+				transmitPacket(*packet_to_transmit);
 		}
 
 		// advance time
