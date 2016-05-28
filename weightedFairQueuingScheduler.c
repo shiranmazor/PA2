@@ -187,7 +187,7 @@ int main(void)
 		// handle input at this time
 		input = parsePackets();
 
-		handleInputPackets();
+		HandleInputPackets();
 
 		// handle output
 		if (transmitting == 0 && !buffer_isEmpty())
