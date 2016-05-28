@@ -130,7 +130,7 @@ void HandleInputPackets()
 		{
 			last_round = packet_pointer->arrival_time;
 			calcFinishTime(packet_pointer);//calc last pi
-			buffer_write(next_packet);//insert to heap
+			buffer_write(packet_pointer);//insert to heap
 			//remove from queue
 			dequeue(incoming_packets);
 			packet_pointer = (Packet*)queue_front(incoming_packets);
@@ -169,7 +169,11 @@ bool parsePackets()
 		enqueue(incoming_packets, next_packet);
 
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
+		if (fgets(line, INPUT_SIZE, stdin) != NULL)
+		{
+			parseLine(next_packet, line); //fill in packet
+		}
+			
 		else return FALSE;
 	}
 	if (packets_arrived) last_time = time;
