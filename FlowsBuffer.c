@@ -82,7 +82,7 @@ bool buffer_write(Packet* p)
 bool buffer_isEmpty()
 {
 	//return packetCounter == 0;
-	return (flow_next(flows->data[flows->count - 1]) == NULL);
+	return (flow_next(heap_front(flows)) == NULL);
 }
 
 // pop next flow, dequeue next packet, push flow back to heap
