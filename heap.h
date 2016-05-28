@@ -9,7 +9,7 @@ typedef struct heap
 } FHeap;
 
 int Cmp(Flow *a, Flow *b);
-void heap_init(FHeap * h);
+FHeap* heap_init();
 void heap_push(FHeap * h, Flow *value);
 void heap_pop(FHeap * h);
 

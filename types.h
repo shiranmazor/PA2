@@ -16,7 +16,6 @@ typedef unsigned short Port;
 typedef unsigned char bool;
 typedef unsigned char bit;
 typedef unsigned char byte;
-typedef unsigned long long ulong;
 
 typedef struct Net
 {

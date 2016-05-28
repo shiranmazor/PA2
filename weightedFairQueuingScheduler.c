@@ -112,7 +112,9 @@ void HandleInputPacket(long time_delta)
 
 void transmitPacket(Packet pkt)
 {
-	printf("%d: %s %d %s %d %d", time, inet_ntoa(pkt.net_data.src_addr), pkt.net_data.src_port, inet_ntoa(pkt.net_data.dst_addr), pkt.net_data.dst_port, pkt.length);
+	char* sadd = inet_ntoa(pkt.net_data.src_addr);
+	char* dadd = inet_ntoa(pkt.net_data.dst_addr);
+	printf("%lld: %s %hu %s %hu %u\n", time, sadd, pkt.net_data.src_port, dadd, pkt.net_data.dst_port, pkt.length);
 	transmitting = pkt.length;
 }
 
