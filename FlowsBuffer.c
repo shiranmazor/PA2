@@ -86,14 +86,17 @@ bool buffer_isEmpty()
 }
 
 // pop next flow, dequeue next packet, push flow back to heap
-Packet* getPacketToTransmit()
+Packet* removePacketFromBuffer()
 {
 	Flow* flow = heap_front(flows);
 	heap_pop(flows);
 	Packet* pkt = flow_dequeue(flow);
 	heap_push(flows, flow);
 	return pkt;
+
 }
+
+
 
 //get the next flow and the next packet without deleting them from heap
 //just return the data

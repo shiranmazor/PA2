@@ -120,6 +120,7 @@ int main(void)
 {
 	char line[INPUT_SIZE];
 	bool input;
+	Packet* pkt;
 	InitFlowBuffer();
 	time = 0;
 	long time_delta = 0;
@@ -153,9 +154,12 @@ int main(void)
 		if (transmitting == 0)
 		{
 			// begin transmition of next packet
-			Packet* pkt = getPacketToTransmit();
+			if (time != 0){
+				pkt = removePacketFromBuffer();
+				free(pkt);
+			}
+			pkt = showNextPacketToTransmit();
 			transmitPacket(*pkt);
-			free(pkt);
 		}
 
 		// advance time

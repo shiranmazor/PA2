@@ -39,7 +39,7 @@ Flow* getFlow(const Packet* p, bool* insertP);
 Flow* createFlow(const Packet* p);
 
 void InitFlowBuffer();
-Packet* getPacketToTransmit();
+Packet* removePacketFromBuffer();
 long buffer_getTotalWeight();
 //algorithm functions
 Packet* showNextPacketToTransmit();
