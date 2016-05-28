@@ -150,24 +150,25 @@ void transmitPacket(Packet pkt)
 bool parsePackets()
 {
 	char line[INPUT_SIZE];
-	bool packets_arrived = FALSE;
+	bool first_packet = FALSE, packets_arrived = FALSE;
 
 	if (time == 0){
 		next_packet = (Packet*)malloc(sizeof(Packet));
 		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
 		else return FALSE;
 		next_packet->time_delta = 0;
+		first_packet = TRUE;
 	}
 
 	while (next_packet->time == time)
 	{
+		if (!first_packet) next_packet->time_delta = time - last_time;
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
 
 		next_packet = (Packet*)malloc(sizeof(Packet));
 		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
 		else return FALSE;
-		next_packet->time_delta = time - last_time;
 	}
 	if (packets_arrived) last_time = time;
 	return TRUE;
