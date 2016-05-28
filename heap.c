@@ -10,7 +10,8 @@ int Cmp(Flow *a, Flow *b)
 {
 	Packet* a_pkt = flow_next(a);
 	Packet* b_pkt = flow_next(b);
-	if (a == NULL) return 0; // a is empty, put at heap bottom
+	if (a_pkt == NULL) return 0; // a is empty, put at heap bottom
+	if (b_pkt == NULL) return 1; // b is empty, put at heap bottom
 	if (a_pkt->finish_time == b_pkt->finish_time) return a->priority < b->priority;
 	return a_pkt->finish_time <= b_pkt->finish_time;
 }
