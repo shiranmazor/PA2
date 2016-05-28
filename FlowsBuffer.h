@@ -37,6 +37,7 @@ int flowComapre(const Net* net1, const Net* net2);
 Flow* findFlow(const Packet* p);
 Flow* getFlow(const Packet* p, bool* insertP);
 Flow* createFlow(const Packet* p);
+void freeFlows();
 
 void InitFlowBuffer();
 Packet* removePacketFromBuffer();

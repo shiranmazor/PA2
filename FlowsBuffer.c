@@ -171,6 +171,10 @@ long calcFutureTotalWeight(Packet* leaving_packet)
 		
 }
 
+void freeFlows()
+{
+	for (int i = 0; i < flows->count; i++) flow_free(flows->data[i]);
+}
 /*
 count the flows with packets in his packets queue
 

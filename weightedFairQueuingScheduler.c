@@ -207,7 +207,8 @@ int main(void)
 		transmitting--;
 		
 	} while (!buffer_isEmpty() || input);
-	
-	free(next_packet);
+
+	freeFlows();
+
 	return 0;
 }
