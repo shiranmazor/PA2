@@ -5,6 +5,7 @@
 
 
 static unsigned long long time;
+static unsigned long long last_time;
 static unsigned long long transmitting;
 static Packet* next_packet;
 static Queue* incoming_packets;
@@ -122,6 +123,32 @@ void transmitPacket(Packet pkt)
 	transmitting = pkt.length;
 }
 
+bool parsePackets()
+{
+	char line[INPUT_SIZE];
+	bool packets_arrived = FALSE;
+
+	if (time == 0){
+		next_packet = (Packet*)malloc(sizeof(Packet));
+		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
+		else return FALSE;
+		next_packet->time_delta = 0;
+	}
+
+	while (next_packet->time == time)
+	{
+		packets_arrived = TRUE;
+		enqueue(incoming_packets, next_packet);
+
+		next_packet = (Packet*)malloc(sizeof(Packet));
+		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
+		else return FALSE;
+		next_packet->time_delta = time - last_time;
+	}
+	if (packets_arrived) last_time = time;
+	return TRUE;
+}
+
 int main(void)
 {
 	char line[INPUT_SIZE];
@@ -131,30 +158,14 @@ int main(void)
 	time = 0;
 	long time_delta = 0;
 	transmitting = 0;
-	next_packet = (Packet*)malloc(sizeof(Packet)); 
-	if (next_packet == NULL)
-	{
-		printf("packet allocation failed");
-		return NULL;
-	}
-
-	input = fgets(line, INPUT_SIZE, stdin) != NULL;
-	if (input)
-		parseLine(next_packet, line);//fill in packet
+	incoming_packets = create_queue();
 
 	do
 	{
 		// handle input at this time
-		if (next_packet->time == time)
-		{
-			long x = time_delta;
-			time_delta = 0;
-			HandleInputPacket(x);
-			input = fgets(line, INPUT_SIZE, stdin) != NULL;
-			if (input)
-				parseLine(next_packet, line);
-			continue;
-		}
+		parsePackets();
+
+		handleInputPackets();
 
 		// handle output
 		if (transmitting == 0)
