@@ -117,7 +117,6 @@ for each packet :
 */
 void HandleInputPackets()
 {
-	bool packetHandled = FALSE;
 	Packet* packet_pointer = (Packet*)queue_front(incoming_packets);
 	while (packet_pointer != NULL)
 	{
@@ -154,8 +153,10 @@ bool parsePackets()
 
 	if (time == 0){
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
-		else return FALSE;
+		if (fgets(line, INPUT_SIZE, stdin) != NULL) 
+			parseLine(next_packet, line); //fill in packet
+		else 
+			return FALSE;
 		next_packet->time_delta = 0;
 	}
 
@@ -165,11 +166,14 @@ bool parsePackets()
 		enqueue(incoming_packets, next_packet);
 
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
-		else return FALSE;
+		if (fgets(line, INPUT_SIZE, stdin) != NULL)
+			parseLine(next_packet, line); //fill in packet
+		else 
+			return FALSE;
 		next_packet->time_delta = time - last_time;
 	}
-	if (packets_arrived) last_time = time;
+	if (packets_arrived) 
+		last_time = time;
 	return TRUE;
 }
 
@@ -178,6 +182,7 @@ int main(void)
 	char line[INPUT_SIZE];
 	bool input;
 	Packet* pkt;
+	last_time = 0;
 	InitFlowBuffer();
 	time = 0;
 	long time_delta = 0;
@@ -189,7 +194,7 @@ int main(void)
 		// handle input at this time
 		parsePackets();
 
-		handleInputPackets();
+		HandleInputPackets();
 
 		// handle output
 		if (transmitting == 0)
