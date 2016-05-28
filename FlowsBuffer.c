@@ -6,7 +6,7 @@ static int packetCounter = 0;
 
 void InitFlowBuffer()
 {
-	heap_init(flows);
+	flows=heap_init();
 }
 
 int flowComapre(const Net* net1, const Net* net2)

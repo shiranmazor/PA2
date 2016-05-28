@@ -17,14 +17,15 @@ int Cmp(Flow *a, Flow *b)
 /*
 Prepares the heap for use
 */
-void heap_init(FHeap * h)
+FHeap* heap_init()
 {
-	h = malloc(sizeof(FHeap));
+	FHeap* h = malloc(sizeof(FHeap));
 	h->size = base_size;
 	h->count = 0;
 	h->weight = 0;
 	h->data = malloc(sizeof(Flow *) * base_size);
 	if (!h->data) _exit(1); // Exit if the memory allocation fails
+	return h;
 }
 
 
