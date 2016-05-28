@@ -31,7 +31,7 @@ Flow* findFlow(const Packet* p)
 	for (int i = 0; i < flows->count; i++)
 	{
 		flow = flows->data[i];
-		if (flowComapre(&(p->net_data), &(flow->net_data)))
+		if (flowComapre(p->net_data, flow->net_data))
 			return flow;
 
 	}
