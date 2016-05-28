@@ -215,7 +215,7 @@ int main(void)
 
 		// advance time
 		time++;
-		transmitting--;
+		if (transmitting > 0) transmitting--;
 		
 	} while (!buffer_isEmpty() || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
 
