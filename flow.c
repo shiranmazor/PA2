@@ -6,15 +6,16 @@ static long lastPriority = 0;
 
 bool flow_enqueue(Flow* flow, Packet* p)
 {
-	//create new packet in memory
-	Packet* insertP = (Packet*)malloc(sizeof(Packet));
-	insertP->arrival_time = p->arrival_time;
-	insertP->finish_time = p->finish_time;
-	insertP->length = p->length;
-	insertP->net_data = p->net_data;
-	insertP->time = p->time;
-	insertP->weight = p->weight;
-	return enqueue(flow->packets, insertP);
+	////create new packet in memory
+	//Packet* insertP = (Packet*)malloc(sizeof(Packet));
+	//insertP->arrival_time = p->arrival_time;
+	//insertP->finish_time = p->finish_time;
+	//insertP->length = p->length;
+	//insertP->net_data = p->net_data;
+	//insertP->time = p->time;
+	//insertP->weight = p->weight;
+	//return enqueue(flow->packets, insertP);
+	return enqueue(flow->packets, p);
 }
 
 Packet* flow_dequeue(Flow* flow)
