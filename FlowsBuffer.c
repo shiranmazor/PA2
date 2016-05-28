@@ -1,12 +1,12 @@
 #include "FlowsBuffer.h"
 // the list of flows
-static FHeap flows;
+static FHeap * flows;
 static int packetCounter = 0;
 
 
 void InitFlowBuffer()
 {
-	heap_init(&flows);
+	heap_init(flows);
 }
 
 int flowComapre(const Net* net1, const Net* net2)
@@ -28,9 +28,9 @@ from the flows heap - if exist, if not return null
 Flow* findFlow(const Packet* p)
 {
 	Flow* flow;
-	for (int i = 0; i < flows.count; i++)
+	for (int i = 0; i < flows->count; i++)
 	{
-		flow = flows.data[i];
+		flow = flows->data[i];
 		if (flowComapre(&(p->net_data), &(flow->net_data)) == 0)
 			return flow;
 
@@ -42,7 +42,7 @@ Flow* findFlow(const Packet* p)
 Flow* createFlow(const Packet* p)
 {
 	Flow* f = flow_create(p, buffer_onPacketRemoved);
-	heap_push(&flows, f);
+	heap_push(flows, f);
 	return f;
 }
 
@@ -82,16 +82,16 @@ bool buffer_write(Packet* p)
 bool buffer_isEmpty()
 {
 	//return packetCounter == 0;
-	return (flow_next(flows.data[flows.count - 1]) == NULL);
+	return (flow_next(flows->data[flows->count - 1]) == NULL);
 }
 
 // pop next flow, dequeue next packet, push flow back to heap
 Packet* getPacketToTransmit()
 {
-	Flow* flow = heap_front(&flows);
-	heap_pop(&flows);
+	Flow* flow = heap_front(flows);
+	heap_pop(flows);
 	Packet* pkt = flow_dequeue(flow);
-	heap_push(&flows, flow);
+	heap_push(flows, flow);
 	return pkt;
 }
 
@@ -99,7 +99,7 @@ Packet* getPacketToTransmit()
 //just return the data
 Packet* showNextPacketToTransmit()
 {
-	Flow* flow = heap_front(&flows);
+	Flow* flow = heap_front(flows);
 	Packet* p = (Packet*)queue_front(flow->packets);
 	return p;
 }
@@ -118,7 +118,7 @@ Round reCalcRoundTime(Round round, Round last_round)
 	if (next_p->finish_time < round.round_val)
 	{
 		//get future total weights
-		long oldTotalWeight = flows.weight;
+		long oldTotalWeight = buffer_getTotalWeight();
 		long newTotalWeights = calcFutureTotalWeight(next_p);
 		//find the new x value = the actual time  next p finishtime:
 		double x = (next_p->finish_time * oldTotalWeight) - (oldTotalWeight *last_round.round_val);
@@ -133,7 +133,7 @@ Round reCalcRoundTime(Round round, Round last_round)
 
 long buffer_getTotalWeight()
 {
-	return flows.weight;
+	return flows->weight;
 }
 /*
 calc future flows weight - without changing it actually
@@ -158,7 +158,7 @@ long calcFutureTotalWeight(Packet* leaving_packet)
 			
 			long newFlowWeight = next_packet->weight;
 			//substruct the old flow weight and update the total weight with the new one
-			long totalFlowsWeight = flows.weight - oldFlowWeight + newFlowWeight;
+			long totalFlowsWeight = buffer_getTotalWeight() - oldFlowWeight + newFlowWeight;
 			return totalFlowsWeight;
 		}
 	}
