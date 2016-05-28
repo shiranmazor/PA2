@@ -169,11 +169,7 @@ bool parsePackets()
 		enqueue(incoming_packets, next_packet);
 
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL)
-		{
-			parseLine(next_packet, line); //fill in packet
-		}
-			
+		if (fgets(line, INPUT_SIZE, stdin) != NULL)	parseLine(next_packet, line); //fill in packet
 		else return FALSE;
 	}
 	if (packets_arrived) last_time = time;
@@ -182,7 +178,7 @@ bool parsePackets()
 
 int main(void)
 {
-	bool input;
+	bool input = TRUE;
 	Packet* packet_to_transmit = NULL;
 	InitFlowBuffer();
 	time = 0;
@@ -192,7 +188,7 @@ int main(void)
 	do
 	{
 		// handle input at this time
-		input = parsePackets();
+		if (input) input = parsePackets();
 
 		HandleInputPackets();
 
