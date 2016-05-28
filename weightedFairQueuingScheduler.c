@@ -123,7 +123,7 @@ int main(void)
 	time = 0;
 	long time_delta = 0;
 	transmitting = 0;
-	next_packet = (Packet*)malloc(sizeof(Packet));
+	next_packet = (Packet*)malloc(sizeof(Packet)); 
 	if (next_packet == NULL)
 	{
 		printf("packet allocation failed");
