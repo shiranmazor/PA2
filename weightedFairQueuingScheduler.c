@@ -20,20 +20,22 @@ void parseLine(Packet* p, const char* line)
 {
 	int parameterIndex = 0;
 	char * pch;
+	char * net = NULL;
 	p->weight = -1; // weight default
+	p->net_data = malloc(sizeof(Net));
 	pch = strtok(line, " ");
 	while (pch != NULL)
 	{
 		if (parameterIndex == 0)
 			p->time = atol(pch);
 		if (parameterIndex == 1)
-			p->net_data.src_addr.S_un.S_addr = inet_addr(pch);
+			p->net_data->src_addr.S_un.S_addr = inet_addr(pch);
 		if (parameterIndex == 2)
-			p->net_data.src_port = atoi(pch);
+			p->net_data->src_port = atoi(pch);
 		if (parameterIndex == 3)
-			p->net_data.dst_addr.S_un.S_addr = inet_addr(pch);
+			p->net_data->dst_addr.S_un.S_addr = inet_addr(pch);
 		if (parameterIndex == 4)
-			p->net_data.dst_port = atoi(pch);
+			p->net_data->dst_port = atoi(pch);
 		if (parameterIndex == 5)
 			p->length = atoi(pch);
 		if (parameterIndex == 6)
@@ -143,9 +145,10 @@ void HandleInputPackets()
 
 void transmitPacket(Packet pkt)
 {
-	char* sadd = inet_ntoa(pkt.net_data.src_addr);
-	char* dadd = inet_ntoa(pkt.net_data.dst_addr);
-	printf("%lld: %s %hu %s %hu %u\n", time, sadd, pkt.net_data.src_port, dadd, pkt.net_data.dst_port, pkt.length);
+	char* add = inet_ntoa(pkt.net_data->src_addr);
+	printf("%lld: %s %hu ", time, add, pkt.net_data->src_port);
+	add = inet_ntoa(pkt.net_data->dst_addr);
+	printf("%s %hu %u\n", add, pkt.net_data->dst_port, pkt.length);
 	transmitting = pkt.length;
 }
 

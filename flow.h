@@ -11,7 +11,7 @@ A flow is a FIFO queue of packets of the same Endpoint (srcport,srcaddr,dstport,
 typedef struct TFlow
 {
 	long weight;	// weight. determined by first packet in the flow
-	Net net_data;	// this identifies the flow
+	Net* net_data;	// this identifies the flow
 	long priority; // determine by time arrival time
 	Queue* packets;		// the FIFO queue of packets
 	void(*OnPacketRemoved)(struct TFlow* flow);	// callback to invoke when removing packet from flow

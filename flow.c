@@ -15,6 +15,8 @@ bool flow_enqueue(Flow* flow, Packet* p)
 	//insertP->time = p->time;
 	//insertP->weight = p->weight;
 	//return enqueue(flow->packets, insertP);
+	free(p->net_data);
+	p->net_data = flow->net_data;
 	return enqueue(flow->packets, p);
 }
 
@@ -48,7 +50,11 @@ Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 		return NULL;
 	}
 
-	flow->net_data = p->net_data;
+	flow->net_data = malloc(sizeof(Net));
+	flow->net_data->src_addr = p->net_data->src_addr;
+	flow->net_data->src_port = p->net_data->src_port;
+	flow->net_data->dst_addr = p->net_data->dst_addr;
+	flow->net_data->dst_port = p->net_data->dst_port;
 	if (p->weight != -1) flow->weight = p->weight;
 	else flow->weight = 1;
 	flow->packets = create_queue();
@@ -62,6 +68,7 @@ Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 void flow_free(Flow* flow)
 {
 	free(flow->packets);
+	free(flow->net_data);
 	free(flow);
 }
 
