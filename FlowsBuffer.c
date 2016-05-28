@@ -50,12 +50,15 @@ Flow* createFlow(const Packet* p)
 return relevent flow for the new packet
 if not exist , create a new one and push it to the heap
 */
-Flow* getFlow(const Packet* p)
+Flow* getFlow(const Packet* p , bool* insertP)
 {
 	Flow* f = findFlow(p);
+	*(insertP) = FALSE;
 	if (f == NULL)
+	{
 		f = createFlow(p);
-
+		*(insertP) = TRUE;
+	}
 	return f;
 }
 
@@ -69,9 +72,11 @@ add packet to the relevent flow
 */
 bool buffer_write(Packet* p)
 {
-	Flow* f = getFlow(p);
+	bool insertP = FALSE;
+	Flow* f = getFlow(p, &insertP);
 	packetCounter++;
-	return flow_enqueue(f->packets, p);
+	if (insertP == FALSE)//if we didn't insert the packet
+		return flow_enqueue(f->packets, p);
 }
 
 bool buffer_isEmpty()
