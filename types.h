@@ -9,6 +9,7 @@
 #define DEFAULT_WEIGHT	1
 #define TRUE	1
 #define FALSE	0
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 typedef IN_ADDR Ip;
 typedef unsigned short Port;
@@ -25,15 +26,23 @@ typedef struct Net
 	Port dst_port;
 } Net;
 
+typedef struct Round
+{
+	double round_val;
+	long round_time;
+} Round;
 
 typedef struct Packet
 {
-	unsigned long long time; // do we really need this?
-	unsigned long long finish_time;
+	unsigned long long time;
 	Net net_data;
 	unsigned int length;
-	long weight;	// defaults to 1
+	long weight;	//if zero , no weight has  arrived - optional field
+	Round arrival_time;//represent packet round time
+	double finish_time;//represent last_pi
 } Packet;
+
+
 
 
 

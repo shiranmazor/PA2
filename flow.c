@@ -22,7 +22,7 @@ Packet* flow_dequeue(Flow* flow)
 	return p;
 }
 
-//Flow* flow_create(const Net* net_data, long weight)
+
 Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 {
 	Flow* flow = (Flow*)malloc(sizeof(Flow));

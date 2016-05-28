@@ -34,6 +34,8 @@ bool dequeue(Queue* queue);
 
 void* queue_front(const Queue* queue);
 
+void* queue_second(const Queue* queue);
+
 bool queue_isEmpty(const Queue* queue);
 
 #endif

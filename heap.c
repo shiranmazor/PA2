@@ -14,7 +14,9 @@ int Cmp(Flow *a, Flow *b)
 	return a_pkt->finish_time <= b_pkt->finish_time;
 }
 
-// Prepares the heap for use
+/*
+Prepares the heap for use
+*/
 void heap_init(FHeap * h)
 {
 	h = malloc(sizeof(FHeap));
@@ -25,7 +27,10 @@ void heap_init(FHeap * h)
 	if (!h->data) _exit(1); // Exit if the memory allocation fails
 }
 
-// Inserts element to the heap
+
+/*
+Inserts element to the heap
+*/
 void heap_push(FHeap * h, Flow *value)
 {
 	unsigned int index, parent;
@@ -52,7 +57,9 @@ void heap_push(FHeap * h, Flow *value)
 	if (!queue_isEmpty(value->packets)) h->weight += value->weight;
 }
 
-// Removes the smallest element from the heap
+/*
+remove the smallest element from the heap
+*/
 void heap_pop(FHeap * h)
 {
 	int index, swap, other;
