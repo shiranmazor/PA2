@@ -73,7 +73,11 @@ void calcRound(Packet* p)
 	else
 	{		
 		p->arrival_time.round_time = last_round.round_time + p->time_delta;
-		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;	
+		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
+		if (p->arrival_time.round_val < 0)
+		{
+			int stop = 1;
+		}
 		
 	}	
 }
@@ -146,9 +150,12 @@ void HandleInputPackets()
 void transmitPacket(Packet pkt)
 {
 	char* add = inet_ntoa(pkt.net_data->src_addr);
-	printf("%lld: %s %hu ", time, add, pkt.net_data->src_port);
+	printf("%lld: %lld %s %hu ", time,pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
-	printf("%s %hu %u\n", add, pkt.net_data->dst_port, pkt.length);
+	if (pkt.weight != -1)
+		printf("%s %hu %u     %ld\n", add, pkt.net_data->dst_port, pkt.length, pkt.weight);
+	else
+		printf("%s %hu %u\n", add, pkt.net_data->dst_port, pkt.length);
 	transmitting = pkt.length;
 }
 

@@ -104,6 +104,8 @@ void heapify(Flow** data, unsigned int count)
 	Flow * temp;
 
 	// Move every non-leaf element to the right position in its subtree
+	if (count < 2)
+		return;
 	item = (count >> 1) - 1;
 	while (1)
 	{
