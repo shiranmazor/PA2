@@ -31,7 +31,7 @@ Flow* findFlow(const Packet* p)
 	for (int i = 0; i < flows->count; i++)
 	{
 		flow = flows->data[i];
-		if (flowComapre(&(p->net_data), &(flow->net_data)) == 0)
+		if (flowComapre(&(p->net_data), &(flow->net_data)))
 			return flow;
 
 	}
@@ -128,7 +128,7 @@ Round reCalcRoundTime(Round round, Round last_round)
 		//update last round to be the finish time
 		last_round.round_time = x;
 		last_round.round_val = next_p->finish_time;
-		newRound.round_val = last_round.round_val + (double)(x / newTotalWeights);
+		newRound.round_val = last_round.round_val + (double)x / newTotalWeights;
 
 	}
 	return newRound;

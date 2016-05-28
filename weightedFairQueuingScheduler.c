@@ -57,7 +57,7 @@ void calcRound(Packet* p, int x)
 	else
 	{
 		p->arrival_time.round_time = last_round.round_time + x;
-		p->arrival_time.round_val = last_round.round_val + (double)(x / active_links_weights);
+		p->arrival_time.round_val = last_round.round_val + (double)x / active_links_weights;
 
 		//check if current packet arrival time is bigger then some packet finish time,
 		//in that case - recalculate the flows total weight and change the curret round time
@@ -96,7 +96,8 @@ void calcFinishTime(Packet* p)
 	if (p->weight > 0)//weight has arrived
 		packet_flow_weight = p->weight;
 
-	p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)(p->length / packet_flow_weight);
+	
+	p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / packet_flow_weight;
 	
 }
 // calc next_packet virtual finish time and insert to relevant queue 
