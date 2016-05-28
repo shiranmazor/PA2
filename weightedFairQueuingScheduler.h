@@ -7,7 +7,7 @@
 
 #define INPUT_SIZE 100
 
-void HandleInputPacket(long time_delta);
+void HandleInputPackets()
 void parseLine(Packet* p, const char* line);
 void transmitPacket(Packet pkt);
 int main(void);
