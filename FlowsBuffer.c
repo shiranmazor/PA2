@@ -103,7 +103,11 @@ Packet* removePacketFromBuffer()
 Packet* showNextPacketToTransmit()
 {
 	Packet* p = NULL;
-	Flow* flow = heap_front(flows);
+	Flow* flow;
+	if (flows->count == 0)
+		return NULL;
+	
+	flow = heap_front(flows);
 	if (flow == NULL)
 		return NULL;
 	p = (Packet*)queue_front(flow->packets);
