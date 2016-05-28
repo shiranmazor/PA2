@@ -71,7 +71,7 @@ bool buffer_write(Packet* p)
 {
 	Flow* f = getFlow(p);
 	packetCounter++;
-	return enqueue(f->packets, p);
+	return flow_enqueue(f->packets, p);
 }
 
 bool buffer_isEmpty()

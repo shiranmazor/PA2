@@ -18,7 +18,7 @@ void parseLine(Packet* p, const char* line)
 {
 	int parameterIndex = 0;
 	char * pch;
-	p->weight = 1; // weight default
+	p->weight = -1; // weight default
 	pch = strtok(line, " ");
 	while (pch != NULL)
 	{
@@ -124,7 +124,6 @@ int main(void)
 	long time_delta = 0;
 	transmitting = 0;
 	next_packet = (Packet*)malloc(sizeof(Packet));
-	next_packet->weight = 0;
 	if (next_packet == NULL)
 	{
 		printf("packet allocation failed");

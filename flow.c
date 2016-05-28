@@ -18,7 +18,8 @@ Packet* flow_dequeue(Flow* flow)
 		printf("error removing packet from flow");
 		return NULL;
 	}
-
+	Packet* flow_first = (Packet*)queue_front(flow->packets);
+	if (flow_first->weight != -1) flow->weight = flow_first->weight;
 	return p;
 }
 
@@ -33,7 +34,8 @@ Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 	}
 
 	flow->net_data = p->net_data;
-	flow->weight = p->weight;
+	if (p->weight != -1) flow->weight = p->weight;
+	else flow->weight = 1;
 	flow->packets = create_queue();
 	flow->priority = lastPriority++;
 	flow->OnPacketRemoved = callback;
