@@ -43,10 +43,20 @@ void parseLine(Packet* p, const char* line)
 	}
 }
 
+bool checkRoundValid(Packet* p)
+{
+	//get the next packet to send
+	Packet* next_transmitter_p = showNextPacketToTransmit();
+	if (next_transmitter_p->finish_time < p->arrival_time.round_val)
+		return FALSE;
+	else
+		return TRUE;
+}
+
 /*
 calc arrival time for the packet using last round
 */
-void calcRound(Packet* p, int x)
+void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight();
 	if (active_links_weights == 0)
@@ -56,16 +66,11 @@ void calcRound(Packet* p, int x)
 		p->arrival_time.round_val = 0;
 	}		 
 	else
-	{
-		p->arrival_time.round_time = last_round.round_time + x;
-		p->arrival_time.round_val = last_round.round_val + (double)x / active_links_weights;
-
-		//check if current packet arrival time is bigger then some packet finish time,
-		//in that case - recalculate the flows total weight and change the curret round time
-		p->arrival_time = reCalcRoundTime(p->arrival_time, last_round);		
+	{		
+		p->arrival_time.round_time = last_round.round_time + p->time_delta;
+		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;	
 		
-	}
-	last_round = p->arrival_time;
+	}	
 }
 
 /*
@@ -102,16 +107,35 @@ void calcFinishTime(Packet* p)
 	
 }
 /*
-scan the incoming packt
+scan the incoming packets
+for each packet :
+-calc round (with packet delta)
+- showNext packet to transmit - check if here finish time is smaller
+- if not - insert to buffer and calc lastpi
+- if yes - exist and the packet remain in the queue
 */
 void HandleInputPackets()
 {
-	//for each packet we will calc round (even\arrival time) and last_pi (finish time)
-	calcRound(next_packet, time_delta);
-	calcFinishTime(next_packet);
+	bool packetHandled = FALSE;
+	Packet* packet_pointer = (Packet*)queue_front(incoming_packets);
+	while (packet_pointer != NULL)
+	{
+		//check packet and handle:
+		calcRound(packet_pointer);
 
-	//insert the packet to the flows heap to the relevet flow
-	buffer_write(next_packet);
+		if (checkRoundValid(packet_pointer))//check if the next packet leave before
+		{
+			last_round = packet_pointer->arrival_time;
+			calcFinishTime(packet_pointer);//calc last pi
+			buffer_write(next_packet);//insert to heap
+			//remove from queue
+			dequeue(incoming_packets);
+			packet_pointer = (Packet*)queue_front(incoming_packets);
+		}
+		else//can't treat the rest of the packets
+			return;
+	}
+	
 }
 
 void transmitPacket(Packet pkt)

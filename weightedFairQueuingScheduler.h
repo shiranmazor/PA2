@@ -11,7 +11,8 @@ void HandleInputPacket(long time_delta);
 void parseLine(Packet* p, const char* line);
 void transmitPacket(Packet pkt);
 int main(void);
-void calcRound(Packet* p, int x);
+void calcRound(Packet* p);
+bool checkRoundValid(Packet* p);
 void calcFinishTime(Packet* p);
 
 
