@@ -199,20 +199,25 @@ int main(void)
 		if (transmitting == 0 && !buffer_isEmpty())
 		{
 			// begin transmition of next packet
-			if (packet_to_transmit != NULL){
-				packet_to_transmit = removePacketFromBuffer();
-				free(packet_to_transmit);
-			}
-			packet_to_transmit = showNextPacketToTransmit();
-			if (packet_to_transmit != NULL) 
-				transmitPacket(*packet_to_transmit);
+			//if (packet_to_transmit != NULL){
+			//	packet_to_transmit = removePacketFromBuffer();
+			//	free(packet_to_transmit);
+			//}
+			//packet_to_transmit = showNextPacketToTransmit();
+			//if (packet_to_transmit != NULL) 
+			//	transmitPacket(*packet_to_transmit);
+
+			packet_to_transmit = removePacketFromBuffer();
+			transmitPacket(*packet_to_transmit);
+			free(packet_to_transmit);
+
 		}
 
 		// advance time
 		time++;
 		transmitting--;
 		
-	} while (!buffer_isEmpty() || input);
+	} while (!buffer_isEmpty() || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
 
 	freeFlows();
 
