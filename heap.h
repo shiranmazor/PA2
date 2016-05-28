@@ -19,4 +19,4 @@ void heap_pop(FHeap * h);
 // Frees the allocated memory
 #define heap_term(h) (free((h)->data))
 
-//void heapify(Flow *data[restrict], unsigned int count);
+void heapify(Flow ** data, unsigned int count);

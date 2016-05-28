@@ -97,32 +97,32 @@ void heap_pop(FHeap * h)
 	h->weight -= temp->weight;
 }
 
-//// Heapifies a non-empty array
-//void heapify(type data[restrict], unsigned int count)
-//{
-//	unsigned int item, index, swap, other;
-//	type temp;
-//
-//	// Move every non-leaf element to the right position in its subtree
-//	item = (count >> 1) - 1;
-//	while (1)
-//	{
-//		// Find the position of the current element in its subtree
-//		temp = data[item];
-//		for (index = item; 1; index = swap)
-//		{
-//			// Find the child to swap with
-//			swap = (index << 1) + 1;
-//			if (swap >= count) break; // If there are no children, the current element is positioned
-//			other = swap + 1;
-//			if ((other < count) && CMP(data[other], data[swap])) swap = other;
-//			if CMP(temp, data[swap]) break; // If the bigger child is smaller than or equal to the parent, the heap is reordered
-//
-//			data[index] = data[swap];
-//		}
-//		if (index != item) data[index] = temp;
-//
-//		if (!item) return;
-//		--item;
-//	}
-//}
+// Heapifies a non-empty array
+void heapify(Flow** data, unsigned int count)
+{
+	unsigned int item, index, swap, other;
+	Flow * temp;
+
+	// Move every non-leaf element to the right position in its subtree
+	item = (count >> 1) - 1;
+	while (1)
+	{
+		// Find the position of the current element in its subtree
+		temp = data[item];
+		for (index = item; 1; index = swap)
+		{
+			// Find the child to swap with
+			swap = (index << 1) + 1;
+			if (swap >= count) break; // If there are no children, the current element is positioned
+			other = swap + 1;
+			if ((other < count) && Cmp(data[other], data[swap])) swap = other;
+			if (Cmp(temp, data[swap])) break; // If the bigger child is smaller than or equal to the parent, the heap is reordered
+
+			data[index] = data[swap];
+		}
+		if (index != item) data[index] = temp;
+
+		if (!item) return;
+		--item;
+	}
+}

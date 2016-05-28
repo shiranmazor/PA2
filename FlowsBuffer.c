@@ -76,7 +76,10 @@ bool buffer_write(Packet* p)
 	Flow* f = getFlow(p, &insertP);
 	packetCounter++;
 	if (insertP == FALSE)//if we didn't insert the packet
-		return flow_enqueue(f, p);
+	{
+		flow_enqueue(f, p);
+		heapify(flows->data, flows->count);
+	}
 }
 
 bool buffer_isEmpty()
