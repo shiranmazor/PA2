@@ -121,6 +121,7 @@ void transmitPacket(Packet pkt)
 int main(void)
 {
 	char line[INPUT_SIZE];
+	bool input;
 	InitFlowBuffer();
 	time = 0;
 	long time_delta = 0;
@@ -132,7 +133,8 @@ int main(void)
 		return NULL;
 	}
 
-	if (fgets(line, INPUT_SIZE, stdin) != NULL)
+	input = fgets(line, INPUT_SIZE, stdin) != NULL;
+	if (input)
 		parseLine(next_packet, line);//fill in packet
 
 	do
@@ -143,7 +145,8 @@ int main(void)
 			long x = time_delta;
 			time_delta = 0;
 			HandleInputPacket(x);
-			if (fgets(line, INPUT_SIZE, stdin) != NULL)
+			input = fgets(line, INPUT_SIZE, stdin) != NULL;
+			if (input)
 				parseLine(next_packet, line);
 			continue;
 		}
@@ -162,7 +165,7 @@ int main(void)
 		time_delta++;
 		transmitting--;
 		
-	} while (!buffer_isEmpty());
+	} while (!buffer_isEmpty() && input);
 	
 	free(next_packet);
 	return 0;
