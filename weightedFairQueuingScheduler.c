@@ -48,6 +48,8 @@ bool checkRoundValid(Packet* p)
 {
 	//get the next packet to send
 	Packet* next_transmitter_p = showNextPacketToTransmit();
+	if (next_transmitter_p == NULL)
+		return TRUE;
 	if (next_transmitter_p->finish_time < p->arrival_time.round_val)
 		return FALSE;
 	else
