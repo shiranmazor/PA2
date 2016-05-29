@@ -78,6 +78,9 @@ bool buffer_write(Packet* p)
 	if (insertP == FALSE)//if we didn't insert the packet
 	{
 		flow_enqueue(f, p);
+		if (flows->weight == 0)//in case this flow become active again!
+			update_heap_weight(flows, f->weight);
+
 		heapify(flows->data, flows->count);
 	}
 }
@@ -85,7 +88,10 @@ bool buffer_write(Packet* p)
 bool buffer_isEmpty()
 {
 	//return packetCounter == 0;
-	return (flow_next(heap_front(flows)) == NULL);
+	if (flows->count > 0)
+		return (flow_next(heap_front(flows)) == NULL);
+	else
+		return TRUE;
 }
 
 // pop next flow, dequeue next packet, push flow back to heap

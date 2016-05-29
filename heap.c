@@ -95,6 +95,14 @@ void heap_pop(FHeap * h)
 
 	// update total weight
 	h->weight -= temp->weight;
+	//weight cannot be under zero!
+	if (h->weight < 0)
+		h->weight = 0;
+}
+
+void update_heap_weight(FHeap * h, long weight)
+{
+	h->weight = weight;
 }
 
 // Heapifies a non-empty array
