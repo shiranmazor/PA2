@@ -85,7 +85,6 @@
     <ClCompile Include="FlowsBuffer.c" />
     <ClCompile Include="heap.c" />
     <ClCompile Include="queue.c" />
-    <ClCompile Include="time.c" />
     <ClCompile Include="weightedFairQueuingScheduler.c" />
   </ItemGroup>
   <ItemGroup>
@@ -93,7 +92,6 @@
     <ClInclude Include="FlowsBuffer.h" />
     <ClInclude Include="heap.h" />
     <ClInclude Include="queue.h" />
-    <ClInclude Include="time.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="weightedFairQueuingScheduler.h" />
   </ItemGroup>

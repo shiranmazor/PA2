@@ -44,7 +44,6 @@ Packet* removePacketFromBuffer();
 long buffer_getTotalWeight();
 //algorithm functions
 Packet* showNextPacketToTransmit();
-Round reCalcRoundTime(Round round, Round last_round);
 long calcFutureTotalWeight(Packet* leaving_packet);
 
 #endif
