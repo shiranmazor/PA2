@@ -64,14 +64,23 @@ calc arrival time for the packet using last round
 void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight();
-	if (active_links_weights == 0)
+	if (active_links_weights == 0  && time == 0)
 	{
 		//round(0)=0
 		p->arrival_time.round_time = 0;
 		p->arrival_time.round_val = 0;
 	}		 
 	else
-	{		
+	{	
+		if (active_links_weights == 0)//the buffer was empty
+		{
+			//get this packet flow if exist and take the previous weight
+			Flow* packet_flow = findFlow(p);
+			if (packet_flow == NULL)
+				active_links_weights = 1;
+			else
+				active_links_weights = packet_flow->weight;
+		}
 		p->arrival_time.round_time = last_round.round_time + p->time_delta;
 		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
 		if (p->arrival_time.round_val < 0)
