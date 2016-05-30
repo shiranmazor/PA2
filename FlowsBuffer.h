@@ -18,18 +18,6 @@ bool buffer_write(Packet* p);
 // returns TRUE if the buffer does not contain any packets. FALSE - otherwise.
 bool buffer_isEmpty();
 
-// returns the first (highest priority) flow in the buffer
-//QueueNode* buffer_first();
-
-// callback to be invoked when packet is removed from the buffer, so the buffer can
-// update its internal statistics.
-void buffer_onPacketRemoved(Flow* flow);
-
-//return the number of active flows 
-//long buffer_getActiveLinks();
-
-// clears the buffer and releases any memory allocated by it.
-//void buffer_clear();
 
 //return True if they are in the same flow, else false
 int flowComapre(const Net* net1, const Net* net2);
@@ -44,7 +32,6 @@ Packet* removePacketFromBuffer();
 long buffer_getTotalWeight();
 //algorithm functions
 Packet* showNextPacketToTransmit();
-long calcFutureTotalWeight(Packet* leaving_packet);
 
 #endif
 

@@ -83,10 +83,6 @@ void calcRound(Packet* p)
 		}
 		p->arrival_time.round_time = last_round.round_time + p->time_delta;
 		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
-		if (p->arrival_time.round_val < 0)
-		{
-			int stop = 1;
-		}
 		
 	}	
 }
@@ -103,14 +99,9 @@ void calcFinishTime(Packet* p)
 		prev_last_pi = 0;
 	else
 	{
-		//get previous packet
-		if (packet_flow->packets->count > 0)
-		{
-			Packet* last_packet = (Packet*)packet_flow->packets->newest->data;
-			prev_last_pi = last_packet->finish_time;
-		}
-		else
-			prev_last_pi = 0;		
+		//when a new packet arrived, the finish time is 
+		//calculating by the finish time of the last packet that arrived
+		prev_last_pi = packet_flow->prev_finish_time;
 	}
 	//now we calc the finish time according to the furmula in the reaction:
 	long packet_flow_weight = 1;//default weight
@@ -122,6 +113,9 @@ void calcFinishTime(Packet* p)
 
 	
 	p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / packet_flow_weight;
+	//update flow last_pi-1:
+	if (packet_flow != NULL)
+		packet_flow->prev_finish_time = p->finish_time;
 	
 }
 /*
@@ -162,7 +156,7 @@ void transmitPacket(Packet pkt)
 	printf("%lld: %lld %s %hu ", time,pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
 	if (pkt.weight != -1)
-		printf("%s %hu %u     %ld\n", add, pkt.net_data->dst_port, pkt.length, pkt.weight);
+		printf("%s %hu %u    %ld\n", add, pkt.net_data->dst_port, pkt.length, pkt.weight);
 	else
 		printf("%s %hu %u\n", add, pkt.net_data->dst_port, pkt.length);
 	transmitting = pkt.length;

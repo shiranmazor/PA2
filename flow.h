@@ -14,6 +14,7 @@ typedef struct TFlow
 	Net* net_data;	// this identifies the flow
 	long priority; // determine by time arrival time
 	Queue* packets;		// the FIFO queue of packets
+	double prev_finish_time; //last_p_i-1
 	void(*OnPacketRemoved)(struct TFlow* flow);	// callback to invoke when removing packet from flow
 } Flow;
 
@@ -24,7 +25,7 @@ Packet* flow_dequeue(Flow* flow);
 bool flow_enqueue(Flow* flow, Packet* p);
 
 // creates a new flow.
-Flow* flow_create(Packet *p, void(*callback)(Flow* flow));
+Flow* flow_create(Packet *p);
 
 // frees a flow
 void flow_free(Flow* flow);

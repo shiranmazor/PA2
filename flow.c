@@ -6,15 +6,7 @@ static long lastPriority = 0;
 
 bool flow_enqueue(Flow* flow, Packet* p)
 {
-	////create new packet in memory
-	//Packet* insertP = (Packet*)malloc(sizeof(Packet));
-	//insertP->arrival_time = p->arrival_time;
-	//insertP->finish_time = p->finish_time;
-	//insertP->length = p->length;
-	//insertP->net_data = p->net_data;
-	//insertP->time = p->time;
-	//insertP->weight = p->weight;
-	//return enqueue(flow->packets, insertP);
+
 	free(p->net_data);
 	p->net_data = flow->net_data;
 	return enqueue(flow->packets, p);
@@ -23,7 +15,6 @@ bool flow_enqueue(Flow* flow, Packet* p)
 Packet* flow_dequeue(Flow* flow)
 {
 	Packet* p = (Packet*)queue_front(flow->packets);
-	flow->OnPacketRemoved(flow);
 	if (!dequeue(flow->packets))
 	{
 		printf("error removing packet from flow");
@@ -41,7 +32,7 @@ Packet* flow_dequeue(Flow* flow)
 }
 
 
-Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
+Flow* flow_create(Packet *p)
 {
 	Flow* flow = (Flow*)malloc(sizeof(Flow));
 	if (flow == NULL)
@@ -59,7 +50,7 @@ Flow* flow_create(Packet *p, void(*callback)(struct TFlow* flow))
 	else flow->weight = 1;
 	flow->packets = create_queue();
 	flow->priority = lastPriority++;
-	flow->OnPacketRemoved = callback;
+	flow->prev_finish_time = 0;
 	flow_enqueue(flow, p);
 
 	return flow;

@@ -41,7 +41,7 @@ Flow* findFlow(const Packet* p)
 
 Flow* createFlow(const Packet* p)
 {
-	Flow* f = flow_create(p, buffer_onPacketRemoved);
+	Flow* f = flow_create(p);
 	heap_push(flows, f);
 	return f;
 }
@@ -62,11 +62,6 @@ Flow* getFlow(const Packet* p , bool* insertP)
 	return f;
 }
 
-void buffer_onPacketRemoved(Flow* flow)
-{
-	packetCounter--;
-}
-
 /*
 add packet to the relevent flow
 */
@@ -82,6 +77,11 @@ bool buffer_write(Packet* p)
 			update_heap_weight(flows, f->weight);
 
 		heapify(flows->data, flows->count);
+	}
+	else
+	{
+		//the flow was created now, so we need to update his finish time
+		f->prev_finish_time = p->finish_time;
 	}
 }
 
@@ -128,58 +128,11 @@ long buffer_getTotalWeight()
 {
 	return flows->weight;
 }
-/*
-calc future flows weight - without changing it actually
-*/
-long calcFutureTotalWeight(Packet* leaving_packet)
-{
-	Flow* packets_flow = findFlow(leaving_packet);
-	long oldFlowWeight = packets_flow->weight;
-	//get next packet in packet_queue
-	Packet* next_packet = queue_second(packets_flow->packets);
-	if (next_packet == NULL )
-	{
-		///weight remain the same
-		return buffer_getTotalWeight();
-	}
-	else
-	{
-		if (next_packet->weight == 0)
-			return buffer_getTotalWeight();//packet arrived without weight so the flow weight isn't changing
-		else
-		{
-			
-			long newFlowWeight = next_packet->weight;
-			//substruct the old flow weight and update the total weight with the new one
-			long totalFlowsWeight = buffer_getTotalWeight() - oldFlowWeight + newFlowWeight;
-			return totalFlowsWeight;
-		}
-	}
-		
-}
 
 void freeFlows()
 {
 	for (int i = 0; i < flows->count; i++) flow_free(flows->data[i]);
 }
-/*
-count the flows with packets in his packets queue
 
-long buffer_getActiveLinks()
-{
-	int activeLinks = 0;
-	QueueNode* current = flows.front;
-	while (current != NULL)
-	{
-		Flow* flow = (Flow*)current->data;
-		if (queue_isEmpty(flow->packets) == FALSE)
-			activeLinks++;
 
-		current = current->next;
-	}
-
-	return activeLinks;
-
-}
-*/
 
