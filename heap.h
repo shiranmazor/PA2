@@ -11,8 +11,8 @@ typedef struct heap
 int Cmp(Flow *a, Flow *b);
 FHeap* heap_init();
 void heap_push(FHeap * h, Flow *value);
-void heap_pop(FHeap * h);
-void update_heap_weight(FHeap * h, long weight);
+void heap_pop(FHeap * h, Flow *value);
+//int update_heap_weight(FHeap * h);
 
 // Returns the smallest element in the heap
 #define heap_front(h) (*(h)->data)

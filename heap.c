@@ -56,18 +56,20 @@ void heap_push(FHeap * h, Flow *value)
 	}
 	h->data[index] = value;
 
-	// update total weight
-	if (!queue_isEmpty(value->packets)) h->weight += value->weight;
+	if (!flow_isEmpty(value)) h->weight += value->weight;
 }
 
 /*
 remove the smallest element from the heap
 */
-void heap_pop(FHeap * h)
+void heap_pop(FHeap * h, Flow *value)
 {
 	int index, swap, other;
 
-	// Remove the smallest element
+	// update total weight
+	h->weight -= heap_front(h)->weight;
+
+	// Remove the last element
 	Flow* temp = h->data[--h->count];
 
 	// Resize the heap if it's consuming too much memory
@@ -93,17 +95,21 @@ void heap_pop(FHeap * h)
 	}
 	h->data[index] = temp;
 
-	// update total weight
-	h->weight -= temp->weight;
-	//weight cannot be under zero!
+
 	if (h->weight < 0)
-		h->weight = 0;
+		printf("heap weight error!! curr weight %d\n", h->weight);
 }
 
-void update_heap_weight(FHeap * h, long weight)
-{
-	h->weight = weight;
-}
+//int update_heap_weight(FHeap * h)
+//{
+//	//h->weight = weight;
+//	int weight = 0;
+//	for (int i = 0; i < h->count; i++)
+//		if (!flow_isEmpty(h->data[i]))
+//			weight += h->data[i]->weight;
+//
+//	return weight;
+//}
 
 // Heapifies a non-empty array
 void heapify(Flow** data, unsigned int count)

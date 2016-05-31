@@ -33,4 +33,6 @@ void flow_free(Flow* flow);
 // returns a pointer to the next packet in the flow
 Packet* flow_next(Flow* flow);
 
+bool flow_isEmpty(Flow* flow);
+
 #endif

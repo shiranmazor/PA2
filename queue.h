@@ -38,4 +38,6 @@ void* queue_second(const Queue* queue);
 
 bool queue_isEmpty(const Queue* queue);
 
+void queue_free(const Queue* queue);
+
 #endif

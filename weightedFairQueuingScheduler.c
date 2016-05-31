@@ -64,7 +64,7 @@ calc arrival time for the packet using last round
 void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight();
-	if (active_links_weights == 0  && time == 0)
+	if (active_links_weights == 0)
 	{
 		//round(0)=0
 		p->arrival_time.round_time = 0;
@@ -72,15 +72,6 @@ void calcRound(Packet* p)
 	}		 
 	else
 	{	
-		if (active_links_weights == 0)//the buffer was empty
-		{
-			//get this packet flow if exist and take the previous weight
-			Flow* packet_flow = findFlow(p);
-			if (packet_flow == NULL)
-				active_links_weights = 1;
-			else
-				active_links_weights = packet_flow->weight;
-		}
 		p->arrival_time.round_time = last_round.round_time + p->time_delta;
 		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
 		
@@ -134,7 +125,6 @@ void HandleInputPackets()
 	{
 		//check packet and handle:
 		calcRound(packet_pointer);
-
 		if (checkRoundValid(packet_pointer))//check if the next packet leave before
 		{
 			last_round = packet_pointer->arrival_time;
@@ -153,7 +143,7 @@ void HandleInputPackets()
 void transmitPacket(Packet pkt)
 {
 	char* add = inet_ntoa(pkt.net_data->src_addr);
-	printf("%lld: %lld %s %hu ", time,pkt.time, add, pkt.net_data->src_port);
+	printf("%lld: %lld %s %hu ", time, pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
 	if (pkt.weight != -1)
 		printf("%s %hu %u    %ld\n", add, pkt.net_data->dst_port, pkt.length, pkt.weight);
@@ -221,6 +211,7 @@ int main(void)
 	} while (!buffer_isEmpty() || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
 
 	freeFlows();
-
+	queue_free(incoming_packets);
+	free(next_packet);
 	return 0;
 }

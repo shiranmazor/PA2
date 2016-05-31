@@ -70,19 +70,24 @@ bool buffer_write(Packet* p)
 	bool insertP = FALSE;
 	Flow* f = getFlow(p, &insertP);
 	packetCounter++;
-	if (insertP == FALSE)//if we didn't insert the packet
+	if (!insertP) //if we didn't insert the packet
 	{
-		flow_enqueue(f, p);
-		if (flows->weight == 0)//in case this flow become active again!
-			update_heap_weight(flows, f->weight);
-
-		heapify(flows->data, flows->count);
+		if (flow_isEmpty(f)){ // revived flow
+			flow_enqueue(f, p);
+			heapify(flows->data, flows->count);
+			flows->weight += f->weight;
+		}
+		else{
+			flow_enqueue(f, p);
+		}
+		//if (flows->weight == 0)//in case this flow become active again!
+		//	update_heap_weight(flows, f->weight);
 	}
-	else
-	{
-		//the flow was created now, so we need to update his finish time
-		f->prev_finish_time = p->finish_time;
-	}
+	//else
+	//{
+	//	//the flow was created now, so we need to update his finish time --moved this to flow_create
+	//	f->prev_finish_time = p->finish_time;
+	//}
 }
 
 bool buffer_isEmpty()
@@ -98,8 +103,9 @@ bool buffer_isEmpty()
 Packet* removePacketFromBuffer()
 {
 	Flow* flow = heap_front(flows);
-	heap_pop(flows);
+	heap_pop(flows, flow);
 	Packet* pkt = flow_dequeue(flow);
+	printf("%d %d %d ", flow->priority, flow->weight, pkt->finish_time);
 	heap_push(flows, flow);
 	return pkt;
 
@@ -123,7 +129,6 @@ Packet* showNextPacketToTransmit()
 	return p;
 }
 
-
 long buffer_getTotalWeight()
 {
 	return flows->weight;
@@ -132,6 +137,7 @@ long buffer_getTotalWeight()
 void freeFlows()
 {
 	for (int i = 0; i < flows->count; i++) flow_free(flows->data[i]);
+	free(flows);
 }
 
 

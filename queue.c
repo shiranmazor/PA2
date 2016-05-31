@@ -29,14 +29,8 @@ bool enqueue(Queue* queue, void* data)
 	temp->data = data;
 	temp->next = NULL;
 
-	if (queue->front == NULL && queue->newest == NULL)
-	{
-		queue->front = queue->newest = temp;
-		queue->count++;
-		return TRUE;
-	}
-
-	queue->newest->next = temp;
+	if (queue->front == NULL) queue->front = temp;
+	else queue->newest->next = temp;
 	queue->newest = temp;
 	queue->count++;
 
@@ -46,11 +40,7 @@ bool enqueue(Queue* queue, void* data)
 bool dequeue(Queue* queue)
 {
 	QueueNode* temp = queue->front;
-	if (queue->front == NULL)
-	{
-		printf("Queue is empty\n");
-		return FALSE;
-	}
+	if (queue->front == NULL) return FALSE;
 
 	if (queue->front == queue->newest)
 		queue->front = queue->newest = NULL;
@@ -58,7 +48,6 @@ bool dequeue(Queue* queue)
 		queue->front = queue->front->next;
 
 	queue->count--;
-
 	free(temp);
 
 	return TRUE;
@@ -74,7 +63,7 @@ void* queue_front(const Queue* queue)
 //get second node after the front
 void* queue_second(const Queue* queue)
 {
-	if (queue->front == NULL)
+	if (queue->front == NULL || queue->front->next == NULL)
 		return NULL;
 		
 	return queue->front->next->data;
@@ -84,4 +73,10 @@ void* queue_second(const Queue* queue)
 bool queue_isEmpty(const Queue* queue)
 {
 	return (queue->count == 0);
+}
+
+void queue_free(const Queue* queue)
+{
+	while (dequeue(queue)) continue;
+	free(queue);
 }
