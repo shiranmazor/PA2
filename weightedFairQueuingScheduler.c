@@ -121,20 +121,23 @@ void HandleInputPackets()
 {
 	bool packetHandled = FALSE;
 	Packet* packet_pointer = (Packet*)queue_front(incoming_packets);
-	while (packet_pointer != NULL)
+	while (packet_pointer)
 	{
 		//check packet and handle:
+		pendingPacketWeight(packet_pointer, 1);
 		calcRound(packet_pointer);
 		if (checkRoundValid(packet_pointer))//check if the next packet leave before
 		{
 			last_round = packet_pointer->arrival_time;
 			calcFinishTime(packet_pointer);//calc last pi
+			pendingPacketWeight(packet_pointer, -1);
+
 			buffer_write(packet_pointer);//insert to heap
 			//remove from queue
 			dequeue(incoming_packets);
 			packet_pointer = (Packet*)queue_front(incoming_packets);
 		}
-		else//can't treat the rest of the packets
+		else //can't treat the rest of the packets
 			return;
 	}
 	
@@ -170,7 +173,8 @@ bool parsePackets()
 		if (!first_packet) next_packet->time_delta = time - last_time;
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
-
+		//pendingPacketWeight(next_packet, 1);
+		
 		next_packet = (Packet*)malloc(sizeof(Packet));
 		if (fgets(line, INPUT_SIZE, stdin) != NULL)	parseLine(next_packet, line); //fill in packet
 		else return FALSE;
@@ -187,6 +191,7 @@ int main(void)
 	time = 0;
 	transmitting = 0;
 	transmitting_weight = 0;
+	extra_weight = 0;
 	incoming_packets = create_queue();
 
 	do

@@ -38,7 +38,7 @@ bool enqueue(Queue* queue, void* data)
 }
 
 bool dequeue(Queue* queue)
-{
+{ 
 	QueueNode* temp = queue->front;
 	if (queue->front == NULL) return FALSE;
 

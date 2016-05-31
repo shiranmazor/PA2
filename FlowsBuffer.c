@@ -2,6 +2,7 @@
 // the list of flows
 static FHeap * flows;
 static long transmitting_weight;
+static long extra_weight;
 
 
 void InitFlowBuffer()
@@ -91,7 +92,6 @@ bool buffer_write(Packet* p)
 
 bool buffer_isEmpty()
 {
-	//return packetCounter == 0;
 	if (flows->count > 0)
 		return (flow_next(heap_front(flows)) == NULL);
 	else
@@ -105,7 +105,7 @@ Packet* removePacketFromBuffer()
 	heap_pop(flows, flow);
 	Packet* pkt = flow_dequeue(flow);
 	if (flow_isEmpty(flow)) transmitting_weight = flow->weight;
-	//printf("%ld %ld %f ", flow->priority, flow->weight, pkt->finish_time);
+	//printf("%ld %ld %f || ", flow->priority, flow->weight, pkt->finish_time);
 	heap_push(flows, flow);
 	return pkt;
 
@@ -131,7 +131,15 @@ Packet* showNextPacketToTransmit()
 
 long buffer_getTotalWeight()
 {
-	return flows->weight + transmitting_weight;
+	return flows->weight + transmitting_weight + extra_weight;
+}
+
+void pendingPacketWeight(Packet* p, int sign){
+	Flow* f = findFlow(p);
+	if (!f)
+		extra_weight += sign * (p->weight == -1 ? 1 : p->weight);
+	else if (flow_isEmpty(f))
+		extra_weight += sign * (p->weight == -1 ? f->weight : p->weight);
 }
 
 void freeFlows()

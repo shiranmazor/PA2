@@ -11,7 +11,9 @@ using the scheduling algorithm.
 #include "heap.h"
 #include <stdio.h>
 
+// used for taking into account the weight of packets waiting in the incoming packets queue
 static long transmitting_weight;
+static long extra_weight;
 
 // writes a single packet to the buffer
 bool buffer_write(Packet* p);
@@ -30,9 +32,11 @@ void freeFlows();
 
 void InitFlowBuffer();
 Packet* removePacketFromBuffer();
-long buffer_getTotalWeight();
-//algorithm functions
 Packet* showNextPacketToTransmit();
+long buffer_getTotalWeight();
+
+// used for taking into account the weight of packets waiting in the incoming packets queue
+void pendingPacketWeight(Packet* p, int sign);
 
 #endif
 
