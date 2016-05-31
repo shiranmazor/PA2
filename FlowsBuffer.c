@@ -1,7 +1,7 @@
 #include "FlowsBuffer.h"
 // the list of flows
 static FHeap * flows;
-static int packetCounter = 0;
+static long transmitting_weight;
 
 
 void InitFlowBuffer()
@@ -69,7 +69,6 @@ bool buffer_write(Packet* p)
 {
 	bool insertP = FALSE;
 	Flow* f = getFlow(p, &insertP);
-	packetCounter++;
 	if (!insertP) //if we didn't insert the packet
 	{
 		if (flow_isEmpty(f)){ // revived flow
@@ -105,7 +104,8 @@ Packet* removePacketFromBuffer()
 	Flow* flow = heap_front(flows);
 	heap_pop(flows, flow);
 	Packet* pkt = flow_dequeue(flow);
-	printf("%d %d %d ", flow->priority, flow->weight, pkt->finish_time);
+	if (flow_isEmpty(flow)) transmitting_weight = flow->weight;
+	//printf("%ld %ld %f ", flow->priority, flow->weight, pkt->finish_time);
 	heap_push(flows, flow);
 	return pkt;
 
@@ -131,7 +131,7 @@ Packet* showNextPacketToTransmit()
 
 long buffer_getTotalWeight()
 {
-	return flows->weight;
+	return flows->weight + transmitting_weight;
 }
 
 void freeFlows()

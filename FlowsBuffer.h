@@ -11,6 +11,7 @@ using the scheduling algorithm.
 #include "heap.h"
 #include <stdio.h>
 
+static long transmitting_weight;
 
 // writes a single packet to the buffer
 bool buffer_write(Packet* p);

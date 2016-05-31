@@ -186,6 +186,7 @@ int main(void)
 	InitFlowBuffer();
 	time = 0;
 	transmitting = 0;
+	transmitting_weight = 0;
 	incoming_packets = create_queue();
 
 	do
@@ -205,8 +206,10 @@ int main(void)
 
 		// advance time
 		time++;
-		if (transmitting > 0) 
+		if (transmitting > 0)
 			transmitting--;
+		else
+			transmitting_weight = 0;
 		
 	} while (!buffer_isEmpty() || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
 
