@@ -147,21 +147,22 @@ void HandleInputPackets()
 	Packet* packet_pointer = (Packet*)queue_front(incoming_packets);
 	while (packet_pointer)
 	{
-		Packet* next_virtual_p = showNextPacketToTransmit(TRUE);
+		Packet* next_virtual_p;
+		/*
 		//check packet and handle:
 		if (next_virtual_p != NULL)
 		{
-			while (last_round.round_val >= next_virtual_p->finish_time)
-			{
-				Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
-				free(last_packet);
-				last_packet = NULL;
-				next_virtual_p = showNextPacketToTransmit(TRUE);
-				if (next_virtual_p == NULL)
-					break;
-			}
+		while (last_round.round_val >= next_virtual_p->finish_time)
+		{
+		Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
+		free(last_packet);
+		last_packet = NULL;
+		next_virtual_p = showNextPacketToTransmit(TRUE);
+		if (next_virtual_p == NULL)
+		break;
 		}
-	
+		}
+		*/
 		calcRound(packet_pointer, -1);
 		//while current round is bigger then last_pi of virtual packet
 		//remove the virtual packet from buffer
@@ -169,13 +170,14 @@ void HandleInputPackets()
 		{
 			//extract real delta and
 			double x;//new time delta
+			double delta;
 			Packet* next_virtual_p = showNextPacketToTransmit(TRUE);
 			double current_finish = next_virtual_p->finish_time;
 			long weights = buffer_getTotalWeight(TRUE);
 			x = current_finish*weights - (last_round.round_val)*weights;
-
+			
+			delta = packet_pointer->time - (x + next_virtual_p->time);
 			//update last round
-			//last_round.round_time = last_round.round_time + x;
 			last_round.round_val = current_finish;
 
 			//remove uneeded packets
