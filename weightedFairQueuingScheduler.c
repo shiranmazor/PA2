@@ -16,7 +16,7 @@ static Round last_round;
 line format:
 time Sadd Sport Dadd Dport length [weight]
 */
-void parseLine(Packet* p, const char* line)
+void parseLine(Packet* p, char* line)
 {
 	int parameterIndex = 0;
 	char * pch;
@@ -132,6 +132,7 @@ bool buffer_isIdle()
 {
 	if (transmitting == 0 && buffer_isEmpty(FALSE) == TRUE)
 		return TRUE;
+	return FALSE;
 }
 /*
 scan the incoming packets

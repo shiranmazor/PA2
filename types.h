@@ -28,7 +28,7 @@ typedef struct Net
 typedef struct Round
 {
 	double round_val;
-	long round_time;
+	unsigned long long round_time;
 } Round;
 
 typedef struct Packet
