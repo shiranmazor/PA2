@@ -11,7 +11,7 @@ void HandleInputPackets();
 void parseLine(Packet* p, char* line);
 void transmitPacket(Packet pkt);
 int main(void);
-void calcRound(Packet* p, double new_delta);
+void calcRound(Packet* p);
 void calcFinishTime(Packet* p);
 bool parsePackets();
 bool buffer_isIdle();
