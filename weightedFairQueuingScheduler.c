@@ -64,9 +64,10 @@ void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight(TRUE); //get weight of the virtual buffer
 	if (active_links_weights == 0) 
-		p->round_val = p->time;
+		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time);
 	else
 		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;
+	
 }
 
 /*
@@ -111,10 +112,10 @@ bool buffer_isIdle()
 /*
 scan the incoming packets
 for each packet :
--calc round (with packet delta)
+- calc round (with packet delta)
 - showNext packet to transmit - check if here finish time is smaller
 - if not - insert to buffer and calc lastpi
-- if yes - exist and the packet remain in the queue
+- if yes - remove packet from the virtual heap and recalc round time
 */
 void HandleInputPackets()
 {
@@ -146,6 +147,7 @@ void HandleInputPackets()
 		last_round.round_val = packet_pointer->round_val;
 		
 		calcFinishTime(packet_pointer);//calc last pi
+
 		//insert new packet to both virtual heap and real time heap
 		buffer_write(packet_pointer, TRUE);
 		buffer_write(packet_pointer,FALSE);	
@@ -159,8 +161,6 @@ void HandleInputPackets()
 
 void transmitPacket(Packet pkt)
 {
-	printf("round_val %f ", pkt.round_val);
-	printf("f_time %f ", pkt.finish_time);
 	char* add = inet_ntoa(pkt.net_data->src_addr);
 	printf("%lld: %lld %s %hu ", time, pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
@@ -183,14 +183,12 @@ bool parsePackets()
 		if (fgets(line, INPUT_SIZE, stdin) != NULL)
 			parseLine(next_packet, line); //fill in packet
 		else return FALSE;
-		//next_packet->time_delta = 0;
 		first_packet = TRUE;
 	}
 
 	while (next_packet->time == time)
 	{
-		//Packet* pp;
-		//if (!first_packet) next_packet->time_delta = time - last_time;
+
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
 		
@@ -215,24 +213,18 @@ int main(void)
 
 	do
 	{
-		//Packet* pp;
-		// handle input at this time
 		if (input) 
 			input = parsePackets();
 
-		//debug
 		HandleInputPackets();
 
 		// handle output
 		if (transmitting == 0 && !buffer_isEmpty(FALSE))
 		{
 			//remove packet from real heap
-			//pp = getPacketFromBuffer();
 			packet_to_transmit = removePacketFromBuffer(FALSE);
 			transmitPacket(*packet_to_transmit);
 			free(packet_to_transmit);
-			//pp = getPacketFromBuffer();
-			//packet_to_transmit = NULL;
 		}
 
 		// advance time

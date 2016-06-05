@@ -101,16 +101,6 @@ void heap_pop(FHeap * h, Flow *value)
 		printf("heap weight error!! curr weight %d\n", h->weight);
 }
 
-//int update_heap_weight(FHeap * h)
-//{
-//	//h->weight = weight;
-//	int weight = 0;
-//	for (int i = 0; i < h->count; i++)
-//		if (!flow_isEmpty(h->data[i]))
-//			weight += h->data[i]->weight;
-//
-//	return weight;
-//}
 
 // Heapifies a non-empty array
 void heapify(Flow** data, unsigned int count)

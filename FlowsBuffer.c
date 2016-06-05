@@ -240,16 +240,6 @@ long get_trasmittingWeight()
 {
 	return flows->transmitting_weight;
 }
-/*
-void pendingPacketWeight(Packet* p, int sign)
-{
-Flow* f = findFlow(p);
-if (!f)
-extra_weight += sign * (p->weight == -1 ? 1 : p->weight);
-else if (flow_isEmpty(f))
-extra_weight += sign * (p->weight == -1 ? f->weight : p->weight);
-}
-*/
 
 
 void freeFlows()

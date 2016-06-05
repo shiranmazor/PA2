@@ -39,7 +39,6 @@ typedef struct Packet
 	long weight;	//if zero , no weight has  arrived - optional field
 	double round_val; //represent packet round time
 	double finish_time; //represent last_pi
-	//unsigned long long time_delta;
 } Packet;
 
 
