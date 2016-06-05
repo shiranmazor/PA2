@@ -61,32 +61,23 @@ bool checkRoundValid(Packet* p)
 /*
 calc arrival time for the packet using last round
 */
-void calcRound(Packet* p, double new_delta)
+void calcRound(Packet* p)
 {
 	long active_links_weights = 0;
-
+	double delta = p->time- last_round.round_time;
+	p->arrival_time.round_time = p->time;
 
 	active_links_weights = buffer_getTotalWeight(TRUE);//get weight of the virtual buffer
 	if (active_links_weights == 0)
 	{
 		//round(0)=0
-		p->arrival_time.round_time = 0;
 		p->arrival_time.round_val = 0;
 	}		 
 	else
 	{	
 		// round(round_time) = round_val
-		if (new_delta > 0)
-		{
-			p->arrival_time.round_time = last_round.round_time + p->time_delta;
-			p->arrival_time.round_val = last_round.round_val + (double)new_delta / active_links_weights;
-		}
-		else
-		{
-			p->arrival_time.round_time = last_round.round_time + p->time_delta;
-			p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
-		}	
-		
+		p->arrival_time.round_time = p->time;
+		p->arrival_time.round_val = last_round.round_val + (double)delta / active_links_weights;	
 		
 	}	
 }
@@ -163,10 +154,10 @@ void HandleInputPackets()
 		}
 		}
 		*/
-		calcRound(packet_pointer, -1);
+		calcRound(packet_pointer);
 		//while current round is bigger then last_pi of virtual packet
 		//remove the virtual packet from buffer
-		while (checkRoundValid(packet_pointer) == FALSE)
+		while (checkRoundValid(packet_pointer) == FALSE )
 		{
 			//extract real delta and
 			double x;//new time delta
@@ -181,20 +172,14 @@ void HandleInputPackets()
 			last_round.round_val = current_finish;
 			last_round.round_time = last_round.round_time + x;
 
-			//remove uneeded packets
-			next_virtual_p = showNextPacketToTransmit(TRUE);
-			if (next_virtual_p != NULL && last_round.round_val >= next_virtual_p->finish_time)
-			{
-				Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
-				free(last_packet);
-				last_packet = NULL;
-				next_virtual_p = showNextPacketToTransmit(TRUE);
-				if (next_virtual_p == NULL)
-					break;
-			}
-
+			//remove the packet:
+			Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
+			free(last_packet);
+			last_packet = NULL;
 			//calc round again with correct weights:
-			calcRound(packet_pointer, x);
+			
+			calcRound(packet_pointer);
+
 		}
 		//packet round is valid, update round global 
 		last_round = packet_pointer->arrival_time;
