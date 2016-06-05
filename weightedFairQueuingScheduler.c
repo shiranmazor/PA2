@@ -5,7 +5,6 @@
 
 
 static unsigned long long time;
-static unsigned long long last_time;
 static unsigned long long transmitting;
 static Packet* next_packet;
 static Queue* incoming_packets;
@@ -201,7 +200,6 @@ bool parsePackets()
 		else
 			return FALSE;
 	}
-	if (packets_arrived) last_time = time;
 	return TRUE;
 }
 
