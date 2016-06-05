@@ -18,6 +18,7 @@ bool flow_enqueue(Flow* flow, Packet* p)
 	
 	if (flow_isEmpty(flow) && p->weight != -1) 
 		flow->weight = newp->weight;
+	if (flow_isEmpty(flow)) flow->last = newp->finish_time;
 	return enqueue(flow->packets, newp);
 }
 
@@ -57,6 +58,7 @@ Flow* flow_create(Packet *p)
 	else flow->weight = 1;
 	flow->packets = create_queue();
 	flow->priority = lastPriority++;
+	flow->last = 0.0;
 	flow_enqueue(flow, p);
 
 	return flow;

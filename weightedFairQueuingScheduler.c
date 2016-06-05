@@ -75,6 +75,7 @@ void calcRound(Packet* p)
 	}		 
 	else
 	{	
+		// round(round_time) = round_val
 		p->arrival_time.round_time = last_round.round_time + p->time_delta;
 		p->arrival_time.round_val = last_round.round_val + (double)p->time_delta / active_links_weights;
 		
@@ -86,7 +87,6 @@ calc last_pi of current packet
 */
 void calcFinishTime(Packet* p)
 {	
-	double prev_last_pi;//last
 	//get relevent flow and extract the last_p(i-1) of the previous packet from the virtual
 	Flow* packet_flow = findFlow(p,TRUE);
 	if (packet_flow == NULL)
@@ -99,9 +99,9 @@ void calcFinishTime(Packet* p)
 	}
 	else
 	{
-		int prev_last_pi = 0;
-		if (packet_flow->packets->count != 0)
-			prev_last_pi = ((Packet*)queue_front(packet_flow->packets))->finish_time;
+		//double prev_last_pi = 0.0;
+		//if (packet_flow->packets->count != 0)
+		//	prev_last_pi = ((Packet*)queue_front(packet_flow->packets))->finish_time;
 
 		int weight = 0;
 		if (p->weight > 0)
@@ -109,9 +109,10 @@ void calcFinishTime(Packet* p)
 		else
 			weight = packet_flow->weight;
 
-		p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / weight;
+		//p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / weight;
+		p->finish_time = MAX(last_round.round_val, packet_flow->last) + (double)p->length / weight;
+		packet_flow->last = p->finish_time;
 	}
-
 	
 }
 
@@ -209,7 +210,7 @@ bool parsePackets()
 
 	while (next_packet->time == time)
 	{
-		Packet* pp;
+		//Packet* pp;
 		if (!first_packet) next_packet->time_delta = time - last_time;
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
@@ -236,7 +237,7 @@ int main(void)
 
 	do
 	{
-		Packet* pp;
+		//Packet* pp;
 		// handle input at this time
 		if (input) 
 			input = parsePackets();
@@ -248,12 +249,12 @@ int main(void)
 		if (transmitting == 0 && !buffer_isEmpty(FALSE))
 		{
 			//remove packet from real heap
-			pp = getPacketFromBuffer();
+			//pp = getPacketFromBuffer();
 			packet_to_transmit = removePacketFromBuffer(FALSE);
 			transmitPacket(*packet_to_transmit);
 			free(packet_to_transmit);
-			pp = getPacketFromBuffer();
-			packet_to_transmit = NULL;
+			//pp = getPacketFromBuffer();
+			//packet_to_transmit = NULL;
 		}
 
 		// advance time

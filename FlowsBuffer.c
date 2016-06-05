@@ -167,6 +167,8 @@ Packet* removePacketFromBuffer(bool virtual_f)
 		Flow* flow = heap_front(flows);
 		heap_pop(flows, flow);
 		Packet* pkt = flow_dequeue(flow);
+		//printf("round_v %f round %ld f_time %f", pkt->arrival_time.round_val, pkt->arrival_time.round_time, pkt->finish_time);
+		printf("f_time %f ", pkt->finish_time);
 		heap_push(flows, flow);
 		return pkt;
 	}

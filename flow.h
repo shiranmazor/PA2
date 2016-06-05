@@ -14,6 +14,7 @@ typedef struct TFlow
 	Net* net_data;	// this identifies the flow
 	long priority; // determine by time arrival time
 	Queue* packets;		// the FIFO queue of packets
+	double last;
 	void(*OnPacketRemoved)(struct TFlow* flow);	// callback to invoke when removing packet from flow
 } Flow;
 
