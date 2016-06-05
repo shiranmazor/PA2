@@ -63,7 +63,7 @@ calc arrival time for the packet using last round
 void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight(TRUE); //get weight of the virtual buffer
-	if (active_links_weights == 0)
+	if (active_links_weights == 0) 
 		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time);
 	else
 		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;
@@ -87,7 +87,6 @@ void calcFinishTime(Packet* p)
 	}
 	else
 	{
-
 		int weight = 0;
 		if (p->weight > 0)
 			weight = p->weight;
