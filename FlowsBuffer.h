@@ -13,7 +13,7 @@ using the scheduling algorithm.
 
 
 // writes a single packet to the buffer
-bool buffer_write(Packet* p, bool virtual_f);
+void buffer_write(Packet* p, bool virtual_f);
 
 // returns TRUE if the buffer does not contain any packets. FALSE - otherwise.
 bool buffer_isEmpty(bool virtual_f);
@@ -24,7 +24,7 @@ int flowComapre(const Net* net1, const Net* net2);
 
 Flow* findFlow(const Packet* p, bool virtual_f);
 Flow* getFlow(const Packet* p, bool* insertP, bool virtual_f);
-Flow* createFlow(const Packet* p, bool virtual_f);
+Flow* createFlow(Packet* p, bool virtual_f);
 void freeFlows();
 
 void InitFlowBuffer();

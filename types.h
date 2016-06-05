@@ -28,7 +28,7 @@ typedef struct Net
 typedef struct Round
 {
 	double round_val;
-	long round_time;
+	double round_time;
 } Round;
 
 typedef struct Packet
@@ -37,9 +37,9 @@ typedef struct Packet
 	Net* net_data;
 	unsigned int length;
 	long weight;	//if zero , no weight has  arrived - optional field
-	Round arrival_time;//represent packet round time
-	double finish_time;//represent last_pi
-	unsigned long long time_delta;
+	double round_val; //represent packet round time
+	double finish_time; //represent last_pi
+	//unsigned long long time_delta;
 } Packet;
 
 

@@ -53,7 +53,7 @@ bool dequeue(Queue* queue)
 	return TRUE;
 }
 
-void* queue_front(const Queue* queue)
+void* queue_front(Queue* queue)
 {
 	if (queue->front == NULL)
 		return NULL;
@@ -61,7 +61,7 @@ void* queue_front(const Queue* queue)
 	return queue->front->data;
 }
 //get second node after the front
-void* queue_second(const Queue* queue)
+void* queue_second(Queue* queue)
 {
 	if (queue->front == NULL || queue->front->next == NULL)
 		return NULL;
@@ -70,12 +70,12 @@ void* queue_second(const Queue* queue)
 
 }
 
-bool queue_isEmpty(const Queue* queue)
+bool queue_isEmpty(Queue* queue)
 {
 	return (queue->count == 0);
 }
 
-void queue_free(const Queue* queue)
+void queue_free(Queue* queue)
 {
 	while (dequeue(queue)) continue;
 	free(queue);

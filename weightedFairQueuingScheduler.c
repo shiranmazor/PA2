@@ -16,7 +16,7 @@ static Round last_round;
 line format:
 time Sadd Sport Dadd Dport length [weight]
 */
-void parseLine(Packet* p, const char* line)
+void parseLine(Packet* p, char* line)
 {
 	int parameterIndex = 0;
 	char * pch;
@@ -52,7 +52,7 @@ bool checkRoundValid(Packet* p)
 	Packet* next_transmitter_p = showNextPacketToTransmit(TRUE);
 	if (next_transmitter_p == NULL)
 		return TRUE;
-	if (next_transmitter_p->finish_time < p->arrival_time.round_val)
+	if (next_transmitter_p->finish_time < p->round_val)
 		return FALSE;
 	else
 		return TRUE;
@@ -63,23 +63,11 @@ calc arrival time for the packet using last round
 */
 void calcRound(Packet* p)
 {
-	long active_links_weights = 0;
-	double delta = p->time- last_round.round_time;
-	p->arrival_time.round_time = p->time;
-
-	active_links_weights = buffer_getTotalWeight(TRUE);//get weight of the virtual buffer
-	if (active_links_weights == 0)
-	{
-		//round(0)=0
-		p->arrival_time.round_val = 0;
-	}		 
+	long active_links_weights = buffer_getTotalWeight(TRUE); //get weight of the virtual buffer
+	if (active_links_weights == 0) 
+		p->round_val = 0;
 	else
-	{	
-		// round(round_time) = round_val
-		p->arrival_time.round_time = p->time;
-		p->arrival_time.round_val = last_round.round_val + (double)delta / active_links_weights;	
-		
-	}	
+		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;
 }
 
 /*
@@ -123,6 +111,7 @@ bool buffer_isIdle()
 {
 	if (transmitting == 0 && buffer_isEmpty(FALSE) == TRUE)
 		return TRUE;
+	return FALSE;
 }
 /*
 scan the incoming packets
@@ -138,51 +127,29 @@ void HandleInputPackets()
 	Packet* packet_pointer = (Packet*)queue_front(incoming_packets);
 	while (packet_pointer)
 	{
-		Packet* next_virtual_p;
-		/*
-		//check packet and handle:
-		if (next_virtual_p != NULL)
-		{
-		while (last_round.round_val >= next_virtual_p->finish_time)
-		{
-		Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
-		free(last_packet);
-		last_packet = NULL;
-		next_virtual_p = showNextPacketToTransmit(TRUE);
-		if (next_virtual_p == NULL)
-		break;
-		}
-		}
-		*/
 		calcRound(packet_pointer);
 		//while current round is bigger then last_pi of virtual packet
 		//remove the virtual packet from buffer
-		while (checkRoundValid(packet_pointer) == FALSE )
+		while (checkRoundValid(packet_pointer) == FALSE)
 		{
 			//extract real delta and
-			double x;//new time delta
-			double delta;
-			Packet* next_virtual_p = showNextPacketToTransmit(TRUE);
-			double current_finish = next_virtual_p->finish_time;
 			long weights = buffer_getTotalWeight(TRUE);
-			x = current_finish*weights - (last_round.round_val)*weights;
-			
+			Packet* next_virtual_p = removePacketFromBuffer(TRUE);
+			double x = (next_virtual_p->finish_time - last_round.round_val)*weights;
 			
 			//update last round
-			last_round.round_val = current_finish;
-			last_round.round_time = last_round.round_time + x;
+			last_round.round_val = next_virtual_p->finish_time;
+			last_round.round_time += x;
 
-			//remove the packet:
-			Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
-			free(last_packet);
-			last_packet = NULL;
+			free(next_virtual_p);
+
 			//calc round again with correct weights:
-			
 			calcRound(packet_pointer);
-
 		}
 		//packet round is valid, update round global 
-		last_round = packet_pointer->arrival_time;
+		last_round.round_time = packet_pointer->time;
+		last_round.round_val = packet_pointer->round_val;
+		
 		calcFinishTime(packet_pointer);//calc last pi
 		//insert new packet to both virtual heap and real time heap
 		buffer_write(packet_pointer, TRUE);
@@ -197,8 +164,8 @@ void HandleInputPackets()
 
 void transmitPacket(Packet pkt)
 {
-	printf("round_time %f ", pkt.arrival_time.round_val);
-	printf("f_time %f ", pkt.finish_time);
+	//printf("round_val %f ", pkt.round_val);
+	//printf("f_time %f ", pkt.finish_time);
 	char* add = inet_ntoa(pkt.net_data->src_addr);
 	printf("%lld: %lld %s %hu ", time, pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
@@ -221,14 +188,14 @@ bool parsePackets()
 		if (fgets(line, INPUT_SIZE, stdin) != NULL)
 			parseLine(next_packet, line); //fill in packet
 		else return FALSE;
-		next_packet->time_delta = 0;
+		//next_packet->time_delta = 0;
 		first_packet = TRUE;
 	}
 
 	while (next_packet->time == time)
 	{
 		//Packet* pp;
-		if (!first_packet) next_packet->time_delta = time - last_time;
+		//if (!first_packet) next_packet->time_delta = time - last_time;
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
 		

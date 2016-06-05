@@ -55,9 +55,9 @@ Flow* findFlow(const Packet* p,bool virtual_f)
 	return NULL;
 }
 
-Flow* createFlow(const Packet* p, bool virtual_f)
+Flow* createFlow(Packet* p, bool virtual_f)
 {
-	Flow* f = flow_create(p, virtual_f);
+	Flow* f = flow_create(p);
 	if (virtual_f == TRUE)
 	{
 		heap_push(virtual_flows, f);
@@ -88,7 +88,7 @@ Flow* getFlow(const Packet* p , bool* insertP, bool virtual_f)
 /*
 add packet to the relevent flow
 */
-bool buffer_write(Packet* p, bool virtual_f)
+void buffer_write(Packet* p, bool virtual_f)
 {
 	bool insertP = FALSE;
 	Flow* f = getFlow(p, &insertP, virtual_f);
@@ -167,8 +167,6 @@ Packet* removePacketFromBuffer(bool virtual_f)
 		Flow* flow = heap_front(flows);
 		heap_pop(flows, flow);
 		Packet* pkt = flow_dequeue(flow);
-		//printf("round_v %f round %ld f_time %f", pkt->arrival_time.round_val, pkt->arrival_time.round_time, pkt->finish_time);
-		
 		heap_push(flows, flow);
 		return pkt;
 	}
