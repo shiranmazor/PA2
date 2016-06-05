@@ -5,7 +5,6 @@
 
 
 static unsigned long long time;
-static unsigned long long last_time;
 static unsigned long long transmitting;
 static Packet* next_packet;
 static Queue* incoming_packets;
@@ -65,7 +64,7 @@ void calcRound(Packet* p)
 {
 	long active_links_weights = buffer_getTotalWeight(TRUE); //get weight of the virtual buffer
 	if (active_links_weights == 0) 
-		p->round_val = 0;
+		p->round_val = p->time;
 	else
 		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;
 }
@@ -87,10 +86,6 @@ void calcFinishTime(Packet* p)
 	}
 	else
 	{
-		//double prev_last_pi = 0.0;
-		//if (packet_flow->packets->count != 0)
-		//	prev_last_pi = ((Packet*)queue_front(packet_flow->packets))->finish_time;
-
 		int weight = 0;
 		if (p->weight > 0)
 			weight = p->weight;
@@ -164,8 +159,8 @@ void HandleInputPackets()
 
 void transmitPacket(Packet pkt)
 {
-	//printf("round_val %f ", pkt.round_val);
-	//printf("f_time %f ", pkt.finish_time);
+	printf("round_val %f ", pkt.round_val);
+	printf("f_time %f ", pkt.finish_time);
 	char* add = inet_ntoa(pkt.net_data->src_addr);
 	printf("%lld: %lld %s %hu ", time, pkt.time, add, pkt.net_data->src_port);
 	add = inet_ntoa(pkt.net_data->dst_addr);
@@ -206,7 +201,6 @@ bool parsePackets()
 		else
 			return FALSE;
 	}
-	if (packets_arrived) last_time = time;
 	return TRUE;
 }
 
