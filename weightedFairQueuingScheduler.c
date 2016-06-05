@@ -176,9 +176,10 @@ void HandleInputPackets()
 			long weights = buffer_getTotalWeight(TRUE);
 			x = current_finish*weights - (last_round.round_val)*weights;
 			
-			delta = packet_pointer->time - (x + next_virtual_p->time);
+			
 			//update last round
 			last_round.round_val = current_finish;
+			last_round.round_time = last_round.round_time + x;
 
 			//remove uneeded packets
 			next_virtual_p = showNextPacketToTransmit(TRUE);
