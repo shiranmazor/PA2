@@ -48,8 +48,8 @@ void parseLine(Packet* p, const char* line)
 
 bool checkRoundValid(Packet* p)
 {
-	//get the next packet to send
-	Packet* next_transmitter_p = showNextPacketToTransmit();
+	//get the next packet to send from virtual heap
+	Packet* next_transmitter_p = showNextPacketToTransmit(TRUE);
 	if (next_transmitter_p == NULL)
 		return TRUE;
 	if (next_transmitter_p->finish_time < p->arrival_time.round_val)
@@ -63,7 +63,10 @@ calc arrival time for the packet using last round
 */
 void calcRound(Packet* p)
 {
-	long active_links_weights = buffer_getTotalWeight();
+	long active_links_weights = 0;
+
+
+	active_links_weights = buffer_getTotalWeight(TRUE);//get weight of the virtual buffer
 	if (active_links_weights == 0)
 	{
 		//round(0)=0
@@ -84,30 +87,41 @@ calc last_pi of current packet
 void calcFinishTime(Packet* p)
 {	
 	double prev_last_pi;//last
-	//get relevent flow and extract the last_p(i-1) of the previous packet
-	Flow* packet_flow = findFlow(p);
-	if (packet_flow == NULL)//this packet still don't have a flow she's the first in here flow
-		prev_last_pi = 0;
+	//get relevent flow and extract the last_p(i-1) of the previous packet from the virtual
+	Flow* packet_flow = findFlow(p,TRUE);
+	if (packet_flow == NULL)
+	{
+		int weight = 1;
+		if (p->weight > 0)
+			weight = p->weight;
+
+		p->finish_time = MAX(last_round.round_val, 0.0) + (double)p->length / weight;
+	}
 	else
 	{
-		//when a new packet arrived, the finish time is 
-		//calculating by the finish time of the last packet that arrived
-		prev_last_pi = packet_flow->prev_finish_time;
+		int prev_last_pi = 0;
+		if (packet_flow->packets->count != 0)
+			prev_last_pi = ((Packet*)queue_front(packet_flow->packets))->finish_time;
+
+		int weight = 0;
+		if (p->weight > 0)
+			weight = p->weight;
+		else
+			weight = packet_flow->weight;
+
+		p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / weight;
 	}
-	//now we calc the finish time according to the furmula in the reaction:
-	long packet_flow_weight = 1;//default weight
-	if (packet_flow != NULL)
-		packet_flow_weight = packet_flow->weight;
-
-	if (p->weight > 0)//weight has arrived
-		packet_flow_weight = p->weight;
 
 	
-	p->finish_time = MAX(last_round.round_val, prev_last_pi) + (double)p->length / packet_flow_weight;
-	//update flow last_pi-1:
-	if (packet_flow != NULL)
-		packet_flow->prev_finish_time = p->finish_time;
-	
+}
+
+/*
+check if our real time heap is empty and there is nothing to transmit
+*/
+bool buffer_isIdle()
+{
+	if (transmitting == 0 && buffer_isEmpty(FALSE) == TRUE)
+		return TRUE;
 }
 /*
 scan the incoming packets
@@ -124,21 +138,44 @@ void HandleInputPackets()
 	while (packet_pointer)
 	{
 		//check packet and handle:
-		pendingPacketWeight(packet_pointer, 1);
-		calcRound(packet_pointer);
-		if (checkRoundValid(packet_pointer))//check if the next packet leave before
+		if (buffer_isIdle() == TRUE && buffer_isEmpty(TRUE) == FALSE)//if we finished transmit this packet in real time, remove from the virtual time
 		{
-			last_round = packet_pointer->arrival_time;
-			calcFinishTime(packet_pointer);//calc last pi
-			pendingPacketWeight(packet_pointer, -1);
-
-			buffer_write(packet_pointer);//insert to heap
-			//remove from queue
-			dequeue(incoming_packets);
-			packet_pointer = (Packet*)queue_front(incoming_packets);
+			//debug
+			Packet* pp = getPacketFromBuffer();
+			Packet* last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
+			free(last_packet);
+			last_packet = NULL;
 		}
-		else //can't treat the rest of the packets
-			return;
+		calcRound(packet_pointer);
+		//while current round is bigger then last_pi of virtual packet
+		//remove the virtual packet from buffer
+		while (checkRoundValid(packet_pointer) == FALSE)
+		{
+			Packet* last_packet;
+			//check if the packet still in real flow
+			Packet* real_p = showNextPacketToTransmit(FALSE);
+			Packet* virtual_p = showNextPacketToTransmit(TRUE);
+			if (real_p != NULL)
+			{
+				if (real_p->time == virtual_p->time)
+					return;
+			}
+			last_packet = removePacketFromBuffer(TRUE);//departure time of current packet has arrived
+			free(last_packet);
+			last_packet = NULL;
+			//calc round again with correct weights:
+			calcRound(packet_pointer);
+		}
+		//packet round is valid, update round global 
+		last_round = packet_pointer->arrival_time;
+		calcFinishTime(packet_pointer);//calc last pi
+		//insert new packet to both virtual heap and real time heap
+		buffer_write(packet_pointer, TRUE);
+		buffer_write(packet_pointer,FALSE);	
+		dequeue(incoming_packets);
+		free(packet_pointer);//after performing dequeue we are free the packet
+		packet_pointer = (Packet*)queue_front(incoming_packets);
+
 	}
 	
 }
@@ -160,9 +197,11 @@ bool parsePackets()
 	char line[INPUT_SIZE];
 	bool first_packet = FALSE, packets_arrived = FALSE;
 
-	if (time == 0){
+	if (time == 0)
+	{
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL) parseLine(next_packet, line); //fill in packet
+		if (fgets(line, INPUT_SIZE, stdin) != NULL)
+			parseLine(next_packet, line); //fill in packet
 		else return FALSE;
 		next_packet->time_delta = 0;
 		first_packet = TRUE;
@@ -170,14 +209,17 @@ bool parsePackets()
 
 	while (next_packet->time == time)
 	{
+		Packet* pp;
 		if (!first_packet) next_packet->time_delta = time - last_time;
 		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
-		//pendingPacketWeight(next_packet, 1);
 		
 		next_packet = (Packet*)malloc(sizeof(Packet));
-		if (fgets(line, INPUT_SIZE, stdin) != NULL)	parseLine(next_packet, line); //fill in packet
-		else return FALSE;
+		if (fgets(line, INPUT_SIZE, stdin) != NULL)
+			parseLine(next_packet, line); //fill in packet
+			
+		else
+			return FALSE;
 	}
 	if (packets_arrived) last_time = time;
 	return TRUE;
@@ -190,33 +232,36 @@ int main(void)
 	InitFlowBuffer();
 	time = 0;
 	transmitting = 0;
-	transmitting_weight = 0;
-	extra_weight = 0;
 	incoming_packets = create_queue();
 
 	do
 	{
+		Packet* pp;
 		// handle input at this time
-		if (input) input = parsePackets();
+		if (input) 
+			input = parsePackets();
 
+		//debug
 		HandleInputPackets();
 
 		// handle output
-		if (transmitting == 0 && !buffer_isEmpty())
+		if (transmitting == 0 && !buffer_isEmpty(FALSE))
 		{
-			packet_to_transmit = removePacketFromBuffer();
+			//remove packet from real heap
+			pp = getPacketFromBuffer();
+			packet_to_transmit = removePacketFromBuffer(FALSE);
 			transmitPacket(*packet_to_transmit);
 			free(packet_to_transmit);
+			pp = getPacketFromBuffer();
+			packet_to_transmit = NULL;
 		}
 
 		// advance time
 		time++;
 		if (transmitting > 0)
 			transmitting--;
-		else
-			transmitting_weight = 0;
 		
-	} while (!buffer_isEmpty() || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
+	} while (!buffer_isEmpty(FALSE) || input || transmitting != 0 || !queue_isEmpty(incoming_packets));
 
 	freeFlows();
 	queue_free(incoming_packets);

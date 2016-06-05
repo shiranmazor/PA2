@@ -6,11 +6,19 @@ static long lastPriority = 0;
 
 bool flow_enqueue(Flow* flow, Packet* p)
 {
+	//create new packet
+	
+	Packet* newp = (Packet*)malloc(sizeof(Packet));
+	memcpy(newp, p, sizeof(Packet));
+	//free(newp->net_data);
+	memcpy(newp->net_data, flow->net_data, sizeof(Net));
 
-	free(p->net_data);
-	p->net_data = flow->net_data;
-	if (flow_isEmpty(flow) && p->weight != -1) flow->weight = p->weight;
-	return enqueue(flow->packets, p);
+	//newp->net_data = flow->net_data;
+	//p->net_data = flow->net_data;
+	
+	if (flow_isEmpty(flow) && p->weight != -1) 
+		flow->weight = newp->weight;
+	return enqueue(flow->packets, newp);
 }
 
 Packet* flow_dequeue(Flow* flow)
@@ -21,7 +29,6 @@ Packet* flow_dequeue(Flow* flow)
 		printf("error removing packet from flow");
 		return NULL;
 	}
-	//printf("DEQUEUE count %d\n", flow->packets->count);
 	Packet* flow_first = (Packet*)queue_front(flow->packets);
 	if (flow_first != NULL)
 		//if there are packets left in queue we will change the flow weight
@@ -50,7 +57,6 @@ Flow* flow_create(Packet *p)
 	else flow->weight = 1;
 	flow->packets = create_queue();
 	flow->priority = lastPriority++;
-	flow->prev_finish_time = p->finish_time;
 	flow_enqueue(flow, p);
 
 	return flow;

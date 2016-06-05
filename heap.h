@@ -6,6 +6,7 @@ typedef struct heap
 	long count; // Count of the elements in the heap
 	long weight; // total weight of active flows
 	Flow **data; // Array with the elements
+	long transmitting_weight;// handle the use case of packet transmitting in gps and a new packet arrives, here weight still counts
 } FHeap;
 
 int Cmp(Flow *a, Flow *b);

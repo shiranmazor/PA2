@@ -15,6 +15,7 @@ void calcRound(Packet* p);
 bool checkRoundValid(Packet* p);
 void calcFinishTime(Packet* p);
 bool parsePackets();
+bool buffer_isIdle();
 
 
 #endif

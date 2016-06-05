@@ -25,6 +25,7 @@ FHeap* heap_init()
 	h->size = base_size;
 	h->count = 0;
 	h->weight = 0;
+	h->transmitting_weight = 0;
 	h->data = malloc(sizeof(Flow *) * base_size);
 	if (!h->data) _exit(1); // Exit if the memory allocation fails
 	return h;
