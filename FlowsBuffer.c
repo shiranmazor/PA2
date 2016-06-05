@@ -1,13 +1,11 @@
 #include "FlowsBuffer.h"
-// the list of flows
+// the heap of flows
 static FHeap * flows;
-static FHeap * virtual_flows;//contain virtual flows for the gps protocol
-
-
+static FHeap * virtual_flows; //contain virtual flows for the gps protocol
 
 void InitFlowBuffer()
 {
-	flows=heap_init();
+	flows = heap_init();
 	virtual_flows = heap_init();
 }
 
@@ -30,28 +28,14 @@ from the flows heap - if exist, if not return null
 Flow* findFlow(const Packet* p,bool virtual_f)
 {
 	Flow* flow;
-	if (virtual_f == TRUE)
-	{
-		for (int i = 0; i < virtual_flows->count; i++)
-		{
-			flow = virtual_flows->data[i];
-			if (flowComapre(p->net_data, flow->net_data))
-				return flow;
-
-		}
-	}
-	else
-	{
-		for (int i = 0; i < flows->count; i++)
-		{
-			flow = flows->data[i];
-			if (flowComapre(p->net_data, flow->net_data))
-				return flow;
-
-		}
-	}
+	FHeap* heap = virtual_f ? virtual_flows : flows;
 	
-
+	for (int i = 0; i < heap->count; i++)
+	{
+		flow = heap->data[i];
+		if (flowComapre(p->net_data, flow->net_data))
+			return flow;
+	}
 	return NULL;
 }
 
@@ -59,10 +43,7 @@ Flow* createFlow(Packet* p, bool virtual_f)
 {
 	Flow* f = flow_create(p);
 	if (virtual_f == TRUE)
-	{
 		heap_push(virtual_flows, f);
-
-	}
 	else
 		heap_push(flows, f);
 	
@@ -92,22 +73,13 @@ void buffer_write(Packet* p, bool virtual_f)
 {
 	bool insertP = FALSE;
 	Flow* f = getFlow(p, &insertP, virtual_f);
+	FHeap* heap = virtual_f ? virtual_flows : flows;
 	if (!insertP) //if we didn't insert the packet
 	{
 		if (flow_isEmpty(f)){ // revived flow
 			flow_enqueue(f, p);
-			if (virtual_f)
-			{
-				heapify(virtual_flows->data, virtual_flows->count);
-				virtual_flows->weight += f->weight;
-			}
-				
-			else
-			{
-				heapify(flows->data, flows->count);
-				flows->weight += f->weight;
-			}
-							
+			heapify(heap->data, heap->count);
+			heap->weight += f->weight;
 		}
 		else
 		{
@@ -120,61 +92,25 @@ void buffer_write(Packet* p, bool virtual_f)
 
 bool buffer_isEmpty(bool virtual_f)
 {
-	if (virtual_f == TRUE)
-	{
-		if (virtual_flows->count > 0)
-			return (flow_next(heap_front(virtual_flows)) == NULL);
-		else
-			return TRUE;
-	}
+	FHeap* heap = virtual_f ? virtual_flows : flows;
+
+	if (heap->count > 0)
+		return (flow_next(heap_front(heap)) == NULL);
 	else
-	{
-		if (flows->count > 0)
-			return (flow_next(heap_front(flows)) == NULL);
-		else
-			return TRUE;
-	}
-	
-}
-
-Packet* getPacketFromBuffer()
-{
-	Packet* pkt = NULL;
-	Flow* flow = NULL;
-	if (virtual_flows->count == 0)
-		return NULL;
-
-	flow = heap_front(virtual_flows);
-	if (flow == NULL)
-		return NULL;
-	pkt = (Packet*)queue_front(flow->packets);
-	return pkt;
+		return TRUE;
 }
 
 // pop next flow, dequeue next packet, push flow back to heap
 Packet* removePacketFromBuffer(bool virtual_f)
 {
-	if (virtual_f)
-	{
-		Flow* flow = heap_front(virtual_flows);
-		heap_pop(virtual_flows, flow);
-		Packet* pkt = flow_dequeue(flow);
-		heap_push(virtual_flows, flow);
-		return pkt;
-	}
-	else
-	{
-		Flow* flow = heap_front(flows);
-		heap_pop(flows, flow);
-		Packet* pkt = flow_dequeue(flow);
-		heap_push(flows, flow);
-		return pkt;
-	}
-	
+	FHeap* heap = virtual_f ? virtual_flows : flows;
 
+	Flow* flow = heap_front(heap);
+	heap_pop(heap, flow);
+	Packet* pkt = flow_dequeue(flow);
+	heap_push(heap, flow);
+	return pkt;
 }
-
-
 
 //get the next flow and the next packet without deleting them from heap
 //return the next packet to transmit from virtual heap
@@ -182,65 +118,22 @@ Packet* showNextPacketToTransmit(bool virtual_f)
 {
 	Packet* p = NULL;
 	Flow* flow;
-	if (virtual_f)
-	{
-		if (virtual_flows->count == 0)
-			return NULL;
+	FHeap* heap = virtual_f ? virtual_flows : flows;
 
-		flow = heap_front(virtual_flows);
-		if (flow == NULL)
-			return NULL;
-		p = (Packet*)queue_front(flow->packets);
-		return p;
+	if (heap->count == 0)
+		return NULL;
 
-	}
-	else
-	{
-		if (flows->count == 0)
-			return NULL;
-
-		flow = heap_front(flows);
-		if (flow == NULL)
-			return NULL;
-		p = (Packet*)queue_front(flow->packets);
-		return p;
-	}
-	
+	flow = heap_front(heap);
+	if (flow == NULL)
+		return NULL;
+	p = (Packet*)queue_front(flow->packets);
+	return p;
 }
-long buffer_getTotalWeight(bool virtual_f)
+
+long buffer_getTotalWeight()
 {
-	if (virtual_f)
-		return virtual_flows->weight;
-	else
-		return flows->weight;
+	return virtual_flows->weight;
 }
-void update_trasmittingWeight(long weight)
-{
-	flows->transmitting_weight = weight;
-}
-
-void getActiveLinks()
-{
-	int active_links = 0;
-	long total_count = 0;
-	for (int i = 0; i < flows->count; i++)
-	{
-		Flow* curr = flows->data[i];
-		if (flow_isEmpty(curr) == FALSE)
-		{
-			total_count = total_count + curr->weight;
-			active_links++;
-		}
-
-	}
-	printf("Active links: %d total weight: %ld\n", active_links, total_count);
-}
-
-long get_trasmittingWeight()
-{
-	return flows->transmitting_weight;
-}
-
 
 void freeFlows()
 {

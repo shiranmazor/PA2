@@ -33,11 +33,7 @@ bool enqueue(Queue* queue, void* data);
 bool dequeue(Queue* queue);
 
 void* queue_front(Queue* queue);
-
-void* queue_second(Queue* queue);
-
 bool queue_isEmpty(Queue* queue);
-
 void queue_free(Queue* queue);
 
 #endif

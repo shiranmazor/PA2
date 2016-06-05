@@ -10,12 +10,9 @@ bool flow_enqueue(Flow* flow, Packet* p)
 	
 	Packet* newp = (Packet*)malloc(sizeof(Packet));
 	memcpy(newp, p, sizeof(Packet));
-	//free(newp->net_data);
-	memcpy(newp->net_data, flow->net_data, sizeof(Net));
+	//memcpy(newp->net_data, flow->net_data, sizeof(Net));
+	newp->net_data = flow->net_data;
 
-	//newp->net_data = flow->net_data;
-	//p->net_data = flow->net_data;
-	
 	if (flow_isEmpty(flow) && p->weight != -1) 
 		flow->weight = newp->weight;
 	if (flow_isEmpty(flow)) flow->last = newp->finish_time;

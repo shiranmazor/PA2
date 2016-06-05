@@ -60,15 +60,6 @@ void* queue_front(Queue* queue)
 
 	return queue->front->data;
 }
-//get second node after the front
-void* queue_second(Queue* queue)
-{
-	if (queue->front == NULL || queue->front->next == NULL)
-		return NULL;
-		
-	return queue->front->next->data;
-
-}
 
 bool queue_isEmpty(Queue* queue)
 {

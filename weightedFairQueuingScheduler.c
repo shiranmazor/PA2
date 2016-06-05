@@ -6,8 +6,8 @@
 
 static unsigned long long time;
 static unsigned long long transmitting;
-static Packet* next_packet;
 static Queue* incoming_packets;
+static Packet* next_packet;
 //global variable for the current round of the system according to the incoming packets
 //used only for round calculations for each  recive packet
 static Round last_round;
@@ -62,12 +62,11 @@ calc arrival time for the packet using last round
 */
 void calcRound(Packet* p)
 {
-	long active_links_weights = buffer_getTotalWeight(TRUE); //get weight of the virtual buffer
+	long active_links_weights = buffer_getTotalWeight(); //get weight of the virtual buffer
 	if (active_links_weights == 0) 
 		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time);
 	else
-		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;
-	
+		p->round_val = last_round.round_val + (double)(p->time - last_round.round_time) / active_links_weights;	
 }
 
 /*
@@ -97,7 +96,6 @@ void calcFinishTime(Packet* p)
 		p->finish_time = MAX(last_round.round_val, packet_flow->last) + (double)p->length / weight;
 		packet_flow->last = p->finish_time;
 	}
-	
 }
 
 /*
@@ -129,7 +127,7 @@ void HandleInputPackets()
 		while (checkRoundValid(packet_pointer) == FALSE)
 		{
 			//extract real delta and
-			long weights = buffer_getTotalWeight(TRUE);
+			long weights = buffer_getTotalWeight();
 			Packet* next_virtual_p = removePacketFromBuffer(TRUE);
 			double x = (next_virtual_p->finish_time - last_round.round_val)*weights;
 			
@@ -146,15 +144,17 @@ void HandleInputPackets()
 		last_round.round_time = packet_pointer->time;
 		last_round.round_val = packet_pointer->round_val;
 		
-		calcFinishTime(packet_pointer);//calc last pi
+		calcFinishTime(packet_pointer);
 
 		//insert new packet to both virtual heap and real time heap
 		buffer_write(packet_pointer, TRUE);
 		buffer_write(packet_pointer,FALSE);	
 		dequeue(incoming_packets);
-		free(packet_pointer);//after performing dequeue we are free the packet
-		packet_pointer = (Packet*)queue_front(incoming_packets);
 
+		//after dequeue we can free the packet
+		free(packet_pointer);
+
+		packet_pointer = (Packet*)queue_front(incoming_packets);
 	}
 	
 }
@@ -175,27 +175,23 @@ void transmitPacket(Packet pkt)
 bool parsePackets()
 {
 	char line[INPUT_SIZE];
-	bool first_packet = FALSE, packets_arrived = FALSE;
-
+	
 	if (time == 0)
 	{
 		next_packet = (Packet*)malloc(sizeof(Packet));
 		if (fgets(line, INPUT_SIZE, stdin) != NULL)
 			parseLine(next_packet, line); //fill in packet
-		else return FALSE;
-		first_packet = TRUE;
+		else 
+			return FALSE;
 	}
 
 	while (next_packet->time == time)
 	{
-
-		packets_arrived = TRUE;
 		enqueue(incoming_packets, next_packet);
 		
 		next_packet = (Packet*)malloc(sizeof(Packet));
 		if (fgets(line, INPUT_SIZE, stdin) != NULL)
-			parseLine(next_packet, line); //fill in packet
-			
+			parseLine(next_packet, line); //fill in packet			
 		else
 			return FALSE;
 	}

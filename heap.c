@@ -4,8 +4,11 @@
 #include "flow.h"
 #include "types.h"
 
-static const int base_size = 100;
+static const int base_size = 20;
 
+/*
+Compares 2 elements - set to minimun heap, compare Flows by first packet's finish time
+*/
 int Cmp(Flow *a, Flow *b)
 {
 	Packet* a_pkt = flow_next(a);
@@ -25,12 +28,10 @@ FHeap* heap_init()
 	h->size = base_size;
 	h->count = 0;
 	h->weight = 0;
-	h->transmitting_weight = 0;
 	h->data = malloc(sizeof(Flow *) * base_size);
 	if (!h->data) _exit(1); // Exit if the memory allocation fails
 	return h;
 }
-
 
 /*
 Inserts element to the heap
@@ -101,8 +102,9 @@ void heap_pop(FHeap * h, Flow *value)
 		printf("heap weight error!! curr weight %d\n", h->weight);
 }
 
-
-// Heapifies a non-empty array
+/*
+Heapifies a non-empty array
+*/
 void heapify(Flow** data, unsigned int count)
 {
 	unsigned int item, index, swap, other;

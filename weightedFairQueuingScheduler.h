@@ -16,5 +16,4 @@ void calcFinishTime(Packet* p);
 bool parsePackets();
 bool buffer_isIdle();
 
-
 #endif
